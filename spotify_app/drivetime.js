@@ -2,7 +2,30 @@ sp = getSpotifyApi(1);
 
 exports.init = init;
 
+var drivetimeSocket;
+
+var Drivetime = {
+
+  broadcast: function (stuff) {
+    console.log('trying to play stuff');
+    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(), track: stuff, timestamp: 'x' });
+  },
+
+  listen: function (user) {
+    drivetimeSocket.emit('listen_to', { username: '738130fdbe04d97213c95852701412040836a3b2' });
+
+    drivetimeSocket.on('play', function (x) {
+      console.log('got a notification to play ' + x);
+      sp.trackPlayer(x.track);
+    });
+  }
+
+};
+
 function init() {
+
+  drivetimeSocket = io.connect("ws://172.16.104.242:8081");
+
   updatePageWithTrackDetails();
   sp.trackPlayer.addEventListener("playerStateChanged", function (event) {
     // Only update the page if the track changed
@@ -44,6 +67,8 @@ function updatePageWithTrackDetails() {
   } else {
     var track = playerTrackInfo.track;
     nowPlaying.innerText = track.name + " on the album " + track.album.name + " by " + track.album.artist.name + ".";
+
+    Drivetime.broadcast(track.uri);
   }
 }
 
