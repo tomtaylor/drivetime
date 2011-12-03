@@ -161,13 +161,14 @@ function playPlaylistFromUri(uri) {
   jQuery("a.tracklink").unbind();
   jQuery(document).on("click", "a.tracklink", function() {
 
+    var track = sp.trackPlayer.getNowPlayingTrack();
     Drivetime.broadcast(track);
 
     playATrack(this.href, uri);
     return false;
   });
 
-  Drivetime.broadcast(track);
+  Drivetime.broadcast(tracks[0]);
   playATrack(tracks[0].uri, uri)
 }
 
