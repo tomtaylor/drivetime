@@ -45,6 +45,30 @@ function init() {
 
   Drivetime.init();
   updateNowPlayingUser();
+  
+  var dropTarget = document;
+  dropTarget.addEventListener("dragleave", function (evt) {
+  	evt.preventDefault();
+  	evt.stopPropagation();
+  }, false);
+
+  dropTarget.addEventListener("dragenter", function (evt) {
+  	evt.preventDefault();
+  	evt.stopPropagation();
+  }, false);
+
+  dropTarget.addEventListener("dragover", function (evt) {
+  	evt.preventDefault();
+  	evt.stopPropagation();
+  }, false);
+
+  dropTarget.addEventListener("drop", function (evt) {
+    console.log("Drop!");
+    var uri = evt.dataTransfer.getData("url");
+    playPlaylistFromUri(uri);
+  	evt.preventDefault();
+  	evt.stopPropagation();
+  }, false);
 
   sp.core.addEventListener("argumentsChanged", function(event) {
     updateNowPlayingUser();
@@ -70,41 +94,50 @@ function init() {
     }
   });
   
-  sp.core.addEventListener("linksChanged", function(event) {
-    var playlistURI = sp.core.getLinks()[0];
-    var playlist = sp.core.getPlaylist(playlistURI);
-    var tracks = new Array();
-    for (var i=0; i < playlist.length; i++) {
-      var track = playlist.getTrack(i);
-      tracks.push(track);
-    };
-    // now we display those
-    var playlistElement = document.getElementById("playlist");
-    playlistElement.innerHTML = "";
-    var tracksHTML = "";
-    for (var i=0; i < tracks.length; i++) {
-      var even = false;
-      if(i % 2 == 0) {
-        even = true
-      }
-      
-      var rowtag = "<tr>";
-      if(even) {
-        rowtag = "<tr class='even'>";
-      }
-      
-      tracksHTML = tracksHTML + rowtag + "<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>" + "<td>" + tracks[i].album.name + "</td>" + "<td>" + tracks[i].album.artist.name + "</td>" + "<td>" + millisToTimeString(tracks[i].duration) + "</td>" + "</tr>"
-    };
-    
-    playlistElement.innerHTML = "<h2>Your Playlist</h2><table cellspacing='0'><thead><tr><th>Track</th><th>Album</th><th>Artist</th><th>Duration</th></tr></thead><tbody>" + tracksHTML  + "</tbody></table>"
-    
-    jQuery("a.tracklink").unbind();
-    jQuery(document).on("click", "a.tracklink", function() {
-      playATrack(this.href, playlistURI);
-      return false;
-    });
+  $('document').on('drop', function() {
+    console.log('drop!');
   });
   
+  sp.core.addEventListener("linksChanged", function(event) {
+    var playlistURI = sp.core.getLinks()[0];
+    playPlaylistFromUri(playlistURI);
+  });
+  
+}
+
+function playPlaylistFromUri(uri) {
+  var playlist = sp.core.getPlaylist(uri);
+  var tracks = new Array();
+  for (var i=0; i < playlist.length; i++) {
+    var track = playlist.getTrack(i);
+    tracks.push(track);
+  };
+  // now we display those
+  var playlistElement = document.getElementById("playlist");
+  playlistElement.innerHTML = "";
+  var tracksHTML = "";
+  for (var i=0; i < tracks.length; i++) {
+    var even = false;
+    if(i % 2 == 0) {
+      even = true
+    }
+    
+    var rowtag = "<tr>";
+    if(even) {
+      rowtag = "<tr class='even'>";
+    }
+    
+    tracksHTML = tracksHTML + rowtag + "<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>" + "<td>" + tracks[i].album.name + "</td>" + "<td>" + tracks[i].album.artist.name + "</td>" + "<td>" + millisToTimeString(tracks[i].duration) + "</td>" + "</tr>"
+  };
+  
+  playlistElement.innerHTML = "<h2>Your Playlist</h2><table cellspacing='0'><thead><tr><th>Track</th><th>Album</th><th>Artist</th><th>Duration</th></tr></thead><tbody>" + tracksHTML  + "</tbody></table>"
+  
+  jQuery("a.tracklink").unbind();
+  jQuery(document).on("click", "a.tracklink", function() {
+    playATrack(this.href, uri);
+    return false;
+  });
+  playATrack(tracks[0].uri, uri)
 }
 
 function playATrack (trackUri, playlistUri) {
@@ -166,4 +199,16 @@ function millisToTimeString(millis) {
     remainingSeconds = "0" + remainingSeconds;
   }
   return fullMinutes + ":" + remainingSeconds;
+}
+
+function handleDrop(e) {
+  // this / e.target is current target element.
+
+  if (e.stopPropagation) {
+    e.stopPropagation(); // stops the browser from redirecting.
+  }
+
+  // See the section on the DataTransfer object.
+  console.log("I had something dropped on me");
+  return false;
 }

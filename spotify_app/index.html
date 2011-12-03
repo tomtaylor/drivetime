@@ -9,7 +9,7 @@
     <script src="drivetime.js" type="text/javascript" charset="utf-8"></script>
     <script src="http://172.16.104.242:8081/socket.io/socket.io.js"></script>
 </head>
-<body onload="sp = getSpotifyApi(1); drivetime = sp.require('drivetime'); drivetime.init();">
+<body onload="sp = getSpotifyApi(1); var ui = sp.require('sp://import/scripts/dnd'); drivetime = sp.require('drivetime'); drivetime.init();">
   <h1>Drivetime</h1>
   <p>Drag a playlist in to start playing it; otherwise, choose a DJ to listen to</p>
   <div id="nowplaying"></div>
