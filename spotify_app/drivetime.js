@@ -16,7 +16,7 @@ var Drivetime = {
 
     drivetimeSocket.on('play', function (x) {
       console.log('got a notification to play ' + x);
-      sp.trackPlayer(x.track);
+      sp.trackPlayer.playTrackFromUri(x.track);
     });
   }
 
