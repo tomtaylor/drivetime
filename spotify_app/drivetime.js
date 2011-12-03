@@ -160,9 +160,14 @@ function playPlaylistFromUri(uri) {
   
   jQuery("a.tracklink").unbind();
   jQuery(document).on("click", "a.tracklink", function() {
+
+    Drivetime.broadcast(track);
+
     playATrack(this.href, uri);
     return false;
   });
+
+  Drivetime.broadcast(track);
   playATrack(tracks[0].uri, uri)
 }
 
@@ -194,8 +199,6 @@ function updatePageWithTrackDetails() {
   } else {
     var track = playerTrackInfo.track;
     nowPlaying.innerText = track.name + " on the album " + track.album.name + " by " + track.album.artist.name + ".";
-
-    Drivetime.broadcast(track);
   }
 }
 
