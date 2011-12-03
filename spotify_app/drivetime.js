@@ -15,8 +15,8 @@ var Drivetime = {
     drivetimeSocket.emit('listen_to', { username: user });
 
     drivetimeSocket.on('play', function (x) {
-      console.log('got a notification to play ' + x);
-      sp.trackPlayer(x.track);
+      console.log(x);
+      sp.trackPlayer.playTrackFromUri(x.track, { onSuccess: function () { console.log("playing") }, onFailure: function () { console.log("failure") }, onComplete: function () { console.log("complete") } });
     });
   }
 
@@ -36,6 +36,15 @@ function init() {
     if (event.data.curtrack == true) {
       updatePageWithTrackDetails();
     }
+  });
+  
+  jQuery(document).on("click", "a.tracklink", function() {
+    sp.trackPlayer.playTrackFromUri(this.href, {
+            onSuccess: function() { console.log("success");} ,
+            onFailure: function () { console.log("failure");},
+            onComplete: function () { console.log("complete"); }
+          });
+    return false;
   });
   
   sp.core.addEventListener("linksChanged", function(event) {
