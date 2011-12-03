@@ -3,6 +3,8 @@ sp = getSpotifyApi(1);
 exports.init = init;
 
 var drivetimeSocket;
+var currentBroadcaster;
+
 var Drivetime = {
 
   init: function () {
@@ -25,18 +27,28 @@ var Drivetime = {
   },
 
   broadcast: function (track) {
+    Drivetime.stopListening();
     var now = new Date();
     drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(),
                                               track: track.uri,
                                           timestamp: now.getTime() });
   },
 
-  stopBroadcast: function (track) {
+  stopListening: function () {
+    if (currentBroadcaster) { 
+      drivetimeSocket.emit('stop_listening', { username: currentBroadcaster });
+      currentBroadcaster = null;
+    }
+  },
+
+  stopBroadcast: function () {
     drivetimeSocket.emit('stop_broadcasting', { username: sp.core.getAnonymousUserId() });
   },
 
   listen: function (user) {
+    Drivetime.stopBroadcast();
     drivetimeSocket.emit('listen_to', { username: user });
+    currentBroadcaster = user;
   },
 
 };
