@@ -15,8 +15,8 @@ var Drivetime = {
     drivetimeSocket.emit('listen_to', { username: user });
 
     drivetimeSocket.on('play', function (x) {
-      console.log('got a notification to play ' + x);
-      sp.trackPlayer.playTrackFromUri(x.track);
+      console.log(x);
+      sp.trackPlayer.playTrackFromUri(x.track, { onSuccess: function () { console.log("playing") }, onFailure: function () { console.log("failure") }, onComplete: function () { console.log("complete") } });
     });
   }
 
