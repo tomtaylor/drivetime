@@ -17,3 +17,11 @@ and then you should be able to access it by entering
 spotify:app:drivetime
 
 into the Spotify search bar.
+
+Server
+======
+
+To co-ordinate playback between broadcasters and listeners we have a
+simple node.js server with socket.io.
+
+It requires node 0.6.4.
