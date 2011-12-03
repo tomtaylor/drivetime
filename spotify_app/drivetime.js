@@ -11,15 +11,6 @@ function init() {
     }
   });
   
-  jQuery(document).on("click", "a.tracklink", function() {
-    sp.trackPlayer.playTrackFromUri(this.href, {
-            onSuccess: function() { console.log("success");} ,
-            onFailure: function () { console.log("failure");},
-            onComplete: function () { console.log("complete"); }
-          });
-    return false;
-  });
-  
   sp.core.addEventListener("linksChanged", function(event) {
     var playlistURI = sp.core.getLinks()[0];
     var playlist = sp.core.getPlaylist(playlistURI);
@@ -39,6 +30,16 @@ function init() {
     console.log(tracks[0]);
     
     playlistElement.innerHTML = "<table><thead><tr><th>Track</th><th>Album</th><th>Artist</th><th>Duration</th></tr></thead><tbody>" + tracksHTML  + "</tbody></table>"
+    
+    jQuery("a.tracklink").unbind();
+    jQuery(document).on("click", "a.tracklink", function() {
+      sp.trackPlayer.playTrackFromContext(this.href, 2, playlistURI,  {
+              onSuccess: function() { console.log("success");} ,
+              onFailure: function () { console.log("failure");},
+              onComplete: function () { console.log("complete"); }
+              });
+      return false;
+    });
   });
   
 }
