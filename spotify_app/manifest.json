@@ -8,5 +8,8 @@
     },
     "SupportedLanguages": [
         "en"
+    ],
+    "RequiredPermissions": [
+        "http://drivetime.tomtaylor.com:8081"
     ]
 }
