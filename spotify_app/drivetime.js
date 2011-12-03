@@ -48,9 +48,6 @@ function init() {
     }
   }
 
-  if (sp.core.getAnonymousUserId() != '738130fdbe04d97213c95852701412040836a3b2') {
-    Drivetime.listen('738130fdbe04d97213c95852701412040836a3b2');
-  }
 
   updatePageWithTrackDetails();
   sp.trackPlayer.addEventListener("playerStateChanged", function (event) {
@@ -98,12 +95,19 @@ function init() {
 }
 
 function playATrack (trackUri, playlistUri) {
-
-  sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri,  {
-              onSuccess: function() { console.log("success"); },
-              onFailure: function () { console.log("failure"); },
-              onComplete: function () { console.log("complete"); }
-  });
+  if(playlistUri) {
+    sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri,  {
+                onSuccess: function() { console.log("success"); },
+                onFailure: function () { console.log("failure"); },
+                onComplete: function () { console.log("complete"); }
+    });
+  } else {
+    sp.trackPlayer.playTrackFromUri(trackUri,  {
+                onSuccess: function() { console.log("success"); },
+                onFailure: function () { console.log("failure"); },
+                onComplete: function () { console.log("complete"); }
+    });
+  }
 }
 
 function updatePageWithTrackDetails() {
@@ -125,6 +129,18 @@ function updatePageWithTrackDetails() {
 
 function updateBroadcasters(broadcasters) {
     // this gets a list of broadcasters, each one a hash with some info about what the broadcaster is broadcasting.
+    var broadcastersArray = broadcasters['broadcasters'];
+    var broadcastersHtmlString = "";
+    for (var i=0; i < broadcastersArray.length; i++) {
+      var bc = broadcastersArray[i];
+      console.log("The broadcaster is: ");
+      console.log(bc);
+
+      var userId = bc.username;
+      broadcastersHtmlString += "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:" + userId + "'>" + userId + "</a></h3><p><b>Now playing:</b> " + " </p></li>"
+      
+    };
+    $("#djlist").html(broadcastersHtmlString);
 }
 
 function millisToTimeString(millis) {
