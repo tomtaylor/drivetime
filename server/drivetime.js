@@ -51,7 +51,7 @@ io.sockets.on('connection', function (socket) {
 
       });
 
-      sendBroadcastersToSocket(socket);
+      sendBroadcastersToAll(socket);
     }
 
   });
@@ -82,6 +82,7 @@ io.sockets.on('connection', function (socket) {
         'track': broadcaster.track,
         'username': broadcaster.username
       });
+      sendBroadcastersToAll(socket);
     }
 
   });
@@ -110,6 +111,8 @@ io.sockets.on('connection', function (socket) {
       delete broadcasters[username] ;
     }
 
+    sendBroadcastersToAll(socket);
+
   });
 
   socket.on('disconnect', function () {
@@ -121,8 +124,25 @@ io.sockets.on('connection', function (socket) {
 
 });
 
+function cleanBroadcasters() {
+  var cleanBroadcasters = [];
+
+  _.each(broadcasters, function(broadcaster, username) {
+    var cleanBroadcaster = {
+      'username': username,
+      'track': broadcaster.track,
+      'timestamp': broadcaster.timestamp
+    };
+
+    cleanBroadcasters.push(cleanBroadcaster);
+  });
+
+  return cleanBroadcasters;
+
+}
+
 function sendBroadcastersToSocket(socket) {
-  var cleanBroadcasters = []
+  var cleanBroadcasters = [];
 
   _.each(broadcasters, function(broadcaster, username) {
     var cleanBroadcaster = {
@@ -135,6 +155,24 @@ function sendBroadcastersToSocket(socket) {
   });
 
   socket.emit('broadcasters', {'broadcasters': cleanBroadcasters});
+}
+
+function sendBroadcastersToAll(socket) {
+  var cleanBroadcasters = [];
+
+  _.each(broadcasters, function(broadcaster, username) {
+    var cleanBroadcaster = {
+      'username': username,
+      'track': broadcaster.track,
+      'timestamp': broadcaster.timestamp
+    };
+
+    cleanBroadcasters.push(cleanBroadcaster);
+  });
+
+  socket.broadcast.emit('broadcasters', {'broadcasters': cleanBroadcasters});
+  socket.emit('broadcasters', {'broadcasters': cleanBroadcasters});
+
 }
 
 function removeSocketFromAllListeners(socket) {
