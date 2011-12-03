@@ -142,19 +142,7 @@ function cleanBroadcasters() {
 }
 
 function sendBroadcastersToSocket(socket) {
-  var cleanBroadcasters = [];
-
-  _.each(broadcasters, function(broadcaster, username) {
-    var cleanBroadcaster = {
-      'username': username,
-      'track': broadcaster.track,
-      'timestamp': broadcaster.timestamp
-    };
-
-    cleanBroadcasters.push(cleanBroadcaster);
-  });
-
-  socket.emit('broadcasters', {'broadcasters': cleanBroadcasters});
+  socket.emit('broadcasters', {'broadcasters': cleanBroadcasters()});
 }
 
 function sendBroadcastersToAll(socket) {
