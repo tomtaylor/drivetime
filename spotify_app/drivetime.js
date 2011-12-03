@@ -2,9 +2,11 @@ sp = getSpotifyApi(1);
 
 exports.init = init;
 
-var drivetimeSocket;
-
 var Drivetime = {
+
+  var drivetimeSocket;
+
+  drivetimeSocket = io.connect("ws://172.16.104.242:8081");
 
   broadcast: function (stuff) {
     console.log('trying to play stuff');
@@ -20,11 +22,29 @@ var Drivetime = {
     });
   }
 
+  drivetimeSocket.on('broadcasters', function (broadcasters) {
+    updateBroadcasters(broadcasters);
+  });
+
 };
 
 function init() {
 
-  drivetimeSocket = io.connect("ws://172.16.104.242:8081");
+  updateNowPlayingUser();
+  sp.core.addEventListener("argumentsChagned", function(event) {
+    updateNowPlayingUser();
+  });
+
+  function updateNowPlayingUser() {
+    var args = sp.core.getArguments();
+
+    for (var i = 0, l = args.length; i < l; i++) {
+      if(args[i] == 'name') {
+        Drivetime.listen(args[i+1]);
+        var userId = args[i+1];
+      }
+    }
+  }
 
   if (sp.core.getAnonymousUserId() != '738130fdbe04d97213c95852701412040836a3b2') {
     Drivetime.listen('738130fdbe04d97213c95852701412040836a3b2');
@@ -99,6 +119,10 @@ function updatePageWithTrackDetails() {
 
     Drivetime.broadcast(track.uri);
   }
+}
+
+function updateBroadcasters(broadcasters) {
+    // this gets a list of broadcasters, each one a hash with some info about what the broadcaster is broadcasting.
 }
 
 function millisToTimeString(millis) {
