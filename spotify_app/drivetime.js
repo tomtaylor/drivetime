@@ -22,13 +22,13 @@ var Drivetime = {
 
 };
 
-if (sp.core.getAnonymousUserId() != '738130fdbe04d97213c95852701412040836a3b2') {
-  Drivetime.listen('738130fdbe04d97213c95852701412040836a3b2');
-}
-
 function init() {
 
   drivetimeSocket = io.connect("ws://172.16.104.242:8081");
+
+  if (sp.core.getAnonymousUserId() != '738130fdbe04d97213c95852701412040836a3b2') {
+    Drivetime.listen('738130fdbe04d97213c95852701412040836a3b2');
+  }
 
   updatePageWithTrackDetails();
   sp.trackPlayer.addEventListener("playerStateChanged", function (event) {
