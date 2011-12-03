@@ -58,6 +58,15 @@ function init() {
   Drivetime.init();
   updateNowPlayingUser();
   
+  $("#playlist").hide();
+  
+  jQuery(document).on("click", "button.stop", function() {
+    Drivetime.stopBroadcast();
+    $("#playlist").hide();
+    $("#djs").show();
+    return false;
+  });
+  
   var dropTarget = document;
   dropTarget.addEventListener("dragleave", function (evt) {
   	evt.preventDefault();
@@ -77,6 +86,8 @@ function init() {
   dropTarget.addEventListener("drop", function (evt) {
     console.log("Drop!");
     var uri = evt.dataTransfer.getData("url");
+    $("#playlist").show();
+    $("#djs").hide();
     playPlaylistFromUri(uri);
   	evt.preventDefault();
   	evt.stopPropagation();
@@ -142,7 +153,8 @@ function playPlaylistFromUri(uri) {
     tracksHTML = tracksHTML + rowtag + "<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>" + "<td>" + tracks[i].album.name + "</td>" + "<td>" + tracks[i].album.artist.name + "</td>" + "<td>" + millisToTimeString(tracks[i].duration) + "</td>" + "</tr>"
   };
   
-  playlistElement.innerHTML = "<h2>Your Playlist</h2><table cellspacing='0'><thead><tr><th>Track</th><th>Album</th><th>Artist</th><th>Duration</th></tr></thead><tbody>" + tracksHTML  + "</tbody></table>"
+  playlistElement.innerHTML = "<h2>Your Playlist</h2><div class'stop-button'><button class='new-button stop'>Stop Broadcasting</button></div><table cellspacing='0'><thead><tr><th>Track</th><th>Album</th><th>Artist</th><th>Duration</th></tr></thead><tbody>" + tracksHTML  + "</tbody></table>"
+
   
   jQuery("a.tracklink").unbind();
   jQuery(document).on("click", "a.tracklink", function() {
