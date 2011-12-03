@@ -27,7 +27,7 @@ function init() {
   drivetimeSocket = io.connect("ws://172.16.104.242:8081");
 
   if (sp.core.getAnonymousUserId() != '738130fdbe04d97213c95852701412040836a3b2') {
-    Drivetime.listen({username: '738130fdbe04d97213c95852701412040836a3b2'});
+    Drivetime.listen('738130fdbe04d97213c95852701412040836a3b2');
   }
 
   updatePageWithTrackDetails();
@@ -36,6 +36,15 @@ function init() {
     if (event.data.curtrack == true) {
       updatePageWithTrackDetails();
     }
+  });
+  
+  jQuery(document).on("click", "a.tracklink", function() {
+    sp.trackPlayer.playTrackFromUri(this.href, {
+            onSuccess: function() { console.log("success");} ,
+            onFailure: function () { console.log("failure");},
+            onComplete: function () { console.log("complete"); }
+          });
+    return false;
   });
   
   sp.core.addEventListener("linksChanged", function(event) {
@@ -57,16 +66,6 @@ function init() {
     console.log(tracks[0]);
     
     playlistElement.innerHTML = "<table><thead><tr><th>Track</th><th>Album</th><th>Artist</th><th>Duration</th></tr></thead><tbody>" + tracksHTML  + "</tbody></table>"
-    
-    jQuery("a.tracklink").unbind();
-    jQuery(document).on("click", "a.tracklink", function() {
-      sp.trackPlayer.playTrackFromContext(this.href, 2, playlistURI,  {
-              onSuccess: function() { console.log("success");} ,
-              onFailure: function () { console.log("failure");},
-              onComplete: function () { console.log("complete"); }
-              });
-      return false;
-    });
   });
   
 }
