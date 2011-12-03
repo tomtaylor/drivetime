@@ -20,6 +20,7 @@ function Client(socket) {
   this.statusMetadata = {};
 
   clients.push(this);
+  this.sendServerTime();
   this.refreshBroadcasters();
 
   var that = this;
@@ -107,7 +108,7 @@ Client.prototype.onDisconnect = function() {
   clients = _.without(clients, this);
 };
 
-Client.prototype.onStop = function() {
+Client.prototype.onStop = function(data) {
   this.stopBroadcasting();
   this.stopListening();
   this.status = "stopped";
@@ -163,6 +164,11 @@ Client.prototype.refreshBroadcasters = function() {
   });
 
   this.socket.emit('broadcasters', {'broadcasters': cleanBroadcasters});
+};
+
+Client.prototype.sendServerTime = function() {
+  var now = new Date();
+  this.socket.emit('time', { 'time': now.getTime() });
 };
 
 function refreshAllBroadcasters() {
