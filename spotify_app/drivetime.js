@@ -16,7 +16,7 @@ var Drivetime = {
 
     drivetimeSocket.on('play', function (x) {
       console.log(x);
-      sp.trackPlayer.playTrackFromUri(x.track, { onSuccess: function () { console.log("playing") }, onFailure: function () { console.log("failure") }, onComplete: function () { console.log("complete") } });
+      playATrack(x.track, x.playlist);
     });
   }
 
@@ -68,16 +68,22 @@ function init() {
     
     jQuery("a.tracklink").unbind();
     jQuery(document).on("click", "a.tracklink", function() {
-      sp.trackPlayer.playTrackFromContext(this.href, 2, playlistURI,  {
-              onSuccess: function() { console.log("success");} ,
-              onFailure: function () { console.log("failure");},
-              onComplete: function () { console.log("complete"); }
-              });
+      playATrack(this.href, playlistURI);
       return false;
     });
   });
   
 }
+
+function playATrack (trackUri, playlistUri) {
+
+  sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri,  {
+              onSuccess: function() { console.log("success"); },
+              onFailure: function () { console.log("failure"); },
+              onComplete: function () { console.log("complete"); }
+  });
+}
+
 function updatePageWithTrackDetails() {
 
   var nowPlaying = document.getElementById("nowplaying");
