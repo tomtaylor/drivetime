@@ -8,6 +8,7 @@ var Drivetime = {
   init: function () {
     drivetimeSocket = io.connect("ws://172.16.104.242:8081");
     drivetimeSocket.on('broadcasters', function (broadcasters) {
+      console.log('got broadcasters', broadcasters);
       updateBroadcasters(broadcasters);
     });
   },
