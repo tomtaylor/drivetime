@@ -8,9 +8,20 @@ var Drivetime = {
   init: function () {
     drivetimeSocket = io.connect("ws://172.16.104.242:8081");
     drivetimeSocket.on('broadcasters', function (broadcasters) {
-      console.log('got broadcasters', broadcasters);
+      console.log('Got broadcaster list: ', broadcasters);
       updateBroadcasters(broadcasters);
     });
+
+    drivetimeSocket.on('play', function (playInfo) {
+      console.log("Got request to play: ", playInfo);
+      playATrack(playInfo.track, playInfo.playlist);
+    });
+
+    drivetimeSocket.on('stop_listening', function () {
+      console.log("Got request to stop playing.");
+      // stop playing
+    });
+
   },
 
   broadcast: function (track) {
@@ -20,14 +31,13 @@ var Drivetime = {
                                           timestamp: now.getTime() });
   },
 
+  stopBroadcast: function (track) {
+    drivetimeSocket.emit('stop_broadcasting', { username: sp.core.getAnonymousUserId() });
+  },
+
   listen: function (user) {
     drivetimeSocket.emit('listen_to', { username: user });
-
-    drivetimeSocket.on('play', function (x) {
-      console.log(x);
-      playATrack(x.track, x.playlist);
-    });
-  }
+  },
 
 };
 
