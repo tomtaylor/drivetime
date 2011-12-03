@@ -41,7 +41,6 @@ io.sockets.on('connection', function (socket) {
 
       }
 
-
       // tell everyone listening to this broadcaster that the track has changed
       _.each(broadcaster['listeners'], function(listener) {
         listener.emit('play', {
@@ -83,6 +82,16 @@ io.sockets.on('connection', function (socket) {
         'track': broadcaster.track,
         'username': broadcaster.username
       });
+    }
+
+  });
+
+  socket.on('stop_listening', function(data) {
+    var username = data.username;
+    var broadcaster = broadcasters[username];
+
+    if (broadcaster) {
+      broadcaster['listeners'] = _.without(broadcaster['listeners'], socket);
     }
 
   });
