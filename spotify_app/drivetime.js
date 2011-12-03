@@ -25,17 +25,23 @@ var Drivetime = {
   },
 
   broadcast: function (track) {
+    Drivetime.stopListening();
     var now = new Date();
     drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(),
                                               track: track.uri,
                                           timestamp: now.getTime() });
   },
 
-  stopBroadcast: function (track) {
+  stopListening: function () {
+    drivetimeSocket.emit('stop_listening', { username: sp.core.getAnonymousUserId() });
+  },
+
+  stopBroadcast: function () {
     drivetimeSocket.emit('stop_broadcasting', { username: sp.core.getAnonymousUserId() });
   },
 
   listen: function (user) {
+    Drivetime.stopBroadcast();
     drivetimeSocket.emit('listen_to', { username: user });
   },
 
@@ -146,11 +152,13 @@ function updateBroadcasters(broadcasters) {
     var broadcastersHtmlString = "";
     for (var i=0; i < broadcastersArray.length; i++) {
       var bc = broadcastersArray[i];
-      console.log("The broadcaster is: ");
-      console.log(bc);
-
+      
+      var currentUser = sp.core.getAnonymousUserId();
       var userId = bc.username;
-      broadcastersHtmlString += "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:" + userId + "'>" + userId + "</a></h3><p><b>Now playing:</b> " + " </p></li>"
+      
+      if(userId != currentUser) {
+        broadcastersHtmlString += "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:" + userId + "'>" + userId + "</a></h3><p><b>Now playing:</b> " + " </p></li>"
+      }
       
     };
     $("#djlist").html(broadcastersHtmlString);
