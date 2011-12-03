@@ -224,15 +224,3 @@ function millisToTimeString(millis) {
   }
   return fullMinutes + ":" + remainingSeconds;
 }
-
-function handleDrop(e) {
-  // this / e.target is current target element.
-
-  if (e.stopPropagation) {
-    e.stopPropagation(); // stops the browser from redirecting.
-  }
-
-  // See the section on the DataTransfer object.
-  console.log("I had something dropped on me");
-  return false;
-}
