@@ -146,11 +146,13 @@ function updateBroadcasters(broadcasters) {
     var broadcastersHtmlString = "";
     for (var i=0; i < broadcastersArray.length; i++) {
       var bc = broadcastersArray[i];
-      console.log("The broadcaster is: ");
-      console.log(bc);
-
+      
+      var currentUser = sp.core.getAnonymousUserId();
       var userId = bc.username;
-      broadcastersHtmlString += "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:" + userId + "'>" + userId + "</a></h3><p><b>Now playing:</b> " + " </p></li>"
+      
+      if(userId != currentUser) {
+        broadcastersHtmlString += "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:" + userId + "'>" + userId + "</a></h3><p><b>Now playing:</b> " + " </p></li>"
+      }
       
     };
     $("#djlist").html(broadcastersHtmlString);
