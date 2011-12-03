@@ -137,18 +137,21 @@ function playPlaylistFromUri(uri) {
     var track = playlist.getTrack(i);
     tracks.push(track);
   };
+  
+  buildUIForTracks(tracks)
+
+  Drivetime.broadcast(tracks[0]);
+  playATrack(tracks[0].uri, uri)
+}
+
+function buildUIForTracks(tracks) {
   // now we display those
   var playlistElement = document.getElementById("playlist");
   playlistElement.innerHTML = "";
   var tracksHTML = "";
   for (var i=0; i < tracks.length; i++) {
-    var even = false;
-    if(i % 2 == 0) {
-      even = true
-    }
-    
     var rowtag = "<tr>";
-    if(even) {
+    if(i % 2 == 0) {
       rowtag = "<tr class='even'>";
     }
     
@@ -167,9 +170,6 @@ function playPlaylistFromUri(uri) {
     playATrack(this.href, uri);
     return false;
   });
-
-  Drivetime.broadcast(tracks[0]);
-  playATrack(tracks[0].uri, uri)
 }
 
 function playATrack (trackUri, playlistUri) {
