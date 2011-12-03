@@ -3,28 +3,63 @@ sp = getSpotifyApi(1);
 exports.init = init;
 
 var drivetimeSocket;
-
 var Drivetime = {
 
-  broadcast: function (stuff) {
-    console.log('trying to play stuff');
-    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(), track: stuff, timestamp: 'x' });
+  init: function () {
+    drivetimeSocket = io.connect("ws://172.16.104.242:8081");
+    drivetimeSocket.on('broadcasters', function (broadcasters) {
+      console.log('Got broadcaster list: ', broadcasters);
+      updateBroadcasters(broadcasters);
+    });
+
+    drivetimeSocket.on('play', function (playInfo) {
+      console.log("Got request to play: ", playInfo);
+      playATrack(playInfo.track, playInfo.playlist);
+    });
+
+    drivetimeSocket.on('stop_listening', function () {
+      console.log("Got request to stop playing.");
+      // stop playing
+    });
+
+  },
+
+  broadcast: function (track) {
+    var now = new Date();
+    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(),
+                                              track: track.uri,
+                                          timestamp: now.getTime() });
+  },
+
+  stopBroadcast: function (track) {
+    drivetimeSocket.emit('stop_broadcasting', { username: sp.core.getAnonymousUserId() });
   },
 
   listen: function (user) {
     drivetimeSocket.emit('listen_to', { username: user });
-
-    drivetimeSocket.on('play', function (x) {
-      console.log(x);
-      sp.trackPlayer.playTrackFromUri(x.track, { onSuccess: function () { console.log("playing") }, onFailure: function () { console.log("failure") }, onComplete: function () { console.log("complete") } });
-    });
-  }
+  },
 
 };
 
 function init() {
 
-  drivetimeSocket = io.connect("ws://172.16.104.242:8081");
+  Drivetime.init();
+  updateNowPlayingUser();
+
+  sp.core.addEventListener("argumentsChanged", function(event) {
+    updateNowPlayingUser();
+  });
+
+  function updateNowPlayingUser() {
+    var args = sp.core.getArguments();
+
+    for (var i = 0, l = args.length; i < l; i++) {
+      if(args[i] == 'name') {
+        Drivetime.listen(args[i+1]);
+        var userId = args[i+1];
+      }
+    }
+  }
 
   if (sp.core.getAnonymousUserId() != '738130fdbe04d97213c95852701412040836a3b2') {
     Drivetime.listen('738130fdbe04d97213c95852701412040836a3b2');
@@ -68,16 +103,22 @@ function init() {
     
     jQuery("a.tracklink").unbind();
     jQuery(document).on("click", "a.tracklink", function() {
-      sp.trackPlayer.playTrackFromContext(this.href, 2, playlistURI,  {
-              onSuccess: function() { console.log("success");} ,
-              onFailure: function () { console.log("failure");},
-              onComplete: function () { console.log("complete"); }
-              });
+      playATrack(this.href, playlistURI);
       return false;
     });
   });
   
 }
+
+function playATrack (trackUri, playlistUri) {
+
+  sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri,  {
+              onSuccess: function() { console.log("success"); },
+              onFailure: function () { console.log("failure"); },
+              onComplete: function () { console.log("complete"); }
+  });
+}
+
 function updatePageWithTrackDetails() {
 
   var nowPlaying = document.getElementById("nowplaying");
@@ -91,8 +132,12 @@ function updatePageWithTrackDetails() {
     var track = playerTrackInfo.track;
     nowPlaying.innerText = track.name + " on the album " + track.album.name + " by " + track.album.artist.name + ".";
 
-    Drivetime.broadcast(track.uri);
+    Drivetime.broadcast(track);
   }
+}
+
+function updateBroadcasters(broadcasters) {
+    // this gets a list of broadcasters, each one a hash with some info about what the broadcaster is broadcasting.
 }
 
 function millisToTimeString(millis) {
