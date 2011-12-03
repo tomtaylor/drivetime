@@ -35,7 +35,10 @@ var Drivetime = {
   },
 
   stopListening: function () {
-    drivetimeSocket.emit('stop_listening', { username: currentBroadcaster });
+    if (currentBroadcaster) { 
+      drivetimeSocket.emit('stop_listening', { username: currentBroadcaster });
+      currentBroadcaster = null;
+    }
   },
 
   stopBroadcast: function () {
