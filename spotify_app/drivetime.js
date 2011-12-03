@@ -38,15 +38,6 @@ function init() {
     }
   });
   
-  jQuery(document).on("click", "a.tracklink", function() {
-    sp.trackPlayer.playTrackFromUri(this.href, {
-            onSuccess: function() { console.log("success");} ,
-            onFailure: function () { console.log("failure");},
-            onComplete: function () { console.log("complete"); }
-          });
-    return false;
-  });
-  
   sp.core.addEventListener("linksChanged", function(event) {
     var playlistURI = sp.core.getLinks()[0];
     var playlist = sp.core.getPlaylist(playlistURI);
