@@ -10,7 +10,9 @@
         "en"
     ],
     "RequiredPermissions": [
-        "http://drivetime.tomtaylor.com:8081"
+        "http://drivetime.tomtaylor.com:8081",
+        "http://localhost:8081",
+        "http://172.16.104.242:8081"
     ],
     "AcceptedLinkTypes": [
       "playlist"
