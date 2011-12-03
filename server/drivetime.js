@@ -107,8 +107,7 @@ io.sockets.on('connection', function (socket) {
         listener.emit('stop_listening', { 'username': username });
       });
 
-      broadcasters[username] = null;
-      broadcasters = _.compact(broadcasters);
+      delete broadcasters[username] ;
     }
 
   });
