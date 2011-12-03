@@ -4,14 +4,22 @@
     <meta charset="utf-8">
     <title>My First App</title>
     <link rel="stylesheet" href="sp://import/css/adam.css">
-    <link rel="stylesheet" href="tutorial.css">
+    <link rel="stylesheet" href="drivetime.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="drivetime.js" type="text/javascript" charset="utf-8"></script>
     <script src="http://172.16.104.242:8081/socket.io/socket.io.js"></script>
 </head>
 <body onload="sp = getSpotifyApi(1); drivetime = sp.require('drivetime'); drivetime.init();">
   <h1>Drivetime</h1>
+  <p>Drag a playlist in to start playing it; otherwise, choose a DJ to listen to</p>
   <div id="nowplaying"></div>
-  <div id="playlist"></div>
+  <div class="mainframe">
+    <div id="playlist" class="left">
+    </div>
+    <div id="djs" class="right">
+      <h2>Current DJs</h2>
+    </div>
+    <span class="clear"><!-- clear --></span>
+  </div>
 </body>
 </html>

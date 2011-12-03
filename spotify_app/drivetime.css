@@ -1,0 +1,26 @@
+body {
+  margin: 10px;
+}
+
+span.clear {
+  display: block;
+  clear: both;
+}
+
+.left {
+  float: left;
+  width: 45%;
+}
+
+.right {
+  float: right;
+  width: 45%;
+}
+
+.mainframe {
+  margin: 20px 0;
+}
+
+tr.even td {
+  background: #444;
+}
