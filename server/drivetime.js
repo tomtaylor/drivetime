@@ -91,6 +91,7 @@ io.sockets.on('connection', function (socket) {
     var broadcaster = broadcasters[username];
 
     if (broadcaster) {
+      util.debug('socket ('+socket.id+') stopped listening to broadcaster: ' + broadcaster.username);
       broadcaster['listeners'] = _.without(broadcaster['listeners'], socket);
     }
 
