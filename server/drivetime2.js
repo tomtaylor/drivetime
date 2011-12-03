@@ -24,8 +24,8 @@ function Client(socket) {
   this.refreshBroadcasters();
 
   var that = this;
-  this.socket.on('broadcasting', function(data) { that.onBroadcast(data); } );
-  this.socket.on('listen_to', function(data) { that.onListen(data) } );
+  this.socket.on('broadcast', function(data) { that.onBroadcast(data); } );
+  this.socket.on('listen', function(data) { that.onListen(data) } );
   this.socket.on('stop', function(data) { that.onStop(data); });
   this.socket.on('disconnect', function() { that.onDisconnect(); } );
 }
