@@ -2,11 +2,15 @@ sp = getSpotifyApi(1);
 
 exports.init = init;
 
+var drivetimeSocket;
 var Drivetime = {
 
-  var drivetimeSocket;
-
-  drivetimeSocket = io.connect("ws://172.16.104.242:8081");
+  init: function () {
+    drivetimeSocket = io.connect("ws://172.16.104.242:8081");
+    drivetimeSocket.on('broadcasters', function (broadcasters) {
+      updateBroadcasters(broadcasters);
+    });
+  },
 
   broadcast: function (stuff) {
     console.log('trying to play stuff');
@@ -22,15 +26,13 @@ var Drivetime = {
     });
   }
 
-  drivetimeSocket.on('broadcasters', function (broadcasters) {
-    updateBroadcasters(broadcasters);
-  });
-
 };
 
 function init() {
 
+  Drivetime.init();
   updateNowPlayingUser();
+
   sp.core.addEventListener("argumentsChagned", function(event) {
     updateNowPlayingUser();
   });
