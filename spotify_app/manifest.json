@@ -11,5 +11,8 @@
     ],
     "RequiredPermissions": [
         "http://drivetime.tomtaylor.com:8081"
+    ],
+    "AcceptedLinkTypes": [
+      "playlist"
     ]
 }
