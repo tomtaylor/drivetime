@@ -12,7 +12,7 @@ var Drivetime = {
   },
 
   listen: function (user) {
-    drivetimeSocket.emit('listen_to', { username: '738130fdbe04d97213c95852701412040836a3b2' });
+    drivetimeSocket.emit('listen_to', { username: user });
 
     drivetimeSocket.on('play', function (x) {
       console.log('got a notification to play ' + x);
@@ -21,6 +21,10 @@ var Drivetime = {
   }
 
 };
+
+if (sp.core.getAnonymousUserId() != '738130fdbe04d97213c95852701412040836a3b2') {
+  Drivetime.listen('738130fdbe04d97213c95852701412040836a3b2');
+}
 
 function init() {
 
