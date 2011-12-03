@@ -8,23 +8,36 @@ var Drivetime = {
   init: function () {
     drivetimeSocket = io.connect("ws://172.16.104.242:8081");
     drivetimeSocket.on('broadcasters', function (broadcasters) {
+      console.log('Got broadcaster list: ', broadcasters);
       updateBroadcasters(broadcasters);
     });
+
+    drivetimeSocket.on('play', function (playInfo) {
+      console.log("Got request to play: ", playInfo);
+      playATrack(playInfo.track, playInfo.playlist);
+    });
+
+    drivetimeSocket.on('stop_listening', function () {
+      console.log("Got request to stop playing.");
+      // stop playing
+    });
+
   },
 
-  broadcast: function (stuff) {
-    console.log('trying to play stuff');
-    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(), track: stuff, timestamp: 'x' });
+  broadcast: function (track) {
+    var now = new Date();
+    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(),
+                                              track: track.uri,
+                                          timestamp: now.getTime() });
+  },
+
+  stopBroadcast: function (track) {
+    drivetimeSocket.emit('stop_broadcasting', { username: sp.core.getAnonymousUserId() });
   },
 
   listen: function (user) {
     drivetimeSocket.emit('listen_to', { username: user });
-
-    drivetimeSocket.on('play', function (x) {
-      console.log(x);
-      playATrack(x.track, x.playlist);
-    });
-  }
+  },
 
 };
 
@@ -123,7 +136,7 @@ function updatePageWithTrackDetails() {
     var track = playerTrackInfo.track;
     nowPlaying.innerText = track.name + " on the album " + track.album.name + " by " + track.album.artist.name + ".";
 
-    Drivetime.broadcast(track.uri);
+    Drivetime.broadcast(track);
   }
 }
 

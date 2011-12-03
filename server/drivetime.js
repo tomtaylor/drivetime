@@ -12,6 +12,7 @@ var broadcasters = {};
 io.sockets.on('connection', function (socket) {
 
   util.debug('socket connected: ' + socket.id);
+  sendBroadcastersToSocket(socket);
 
   socket.on('broadcasting', function(data) {
     console.log('socket ('+ socket.id + ') asked to broadcast: ' + util.inspect(data));
@@ -50,6 +51,8 @@ io.sockets.on('connection', function (socket) {
         util.debug('told socket ('+ socket.id + ') to play: ' + util.inspect(broadcaster['track']));
 
       });
+
+      sendBroadcastersToSocket(socket);
     }
 
   });
@@ -64,6 +67,8 @@ io.sockets.on('connection', function (socket) {
     } else {
       util.debug("broadcaster "+ util.debug(username) + " wasn't found");
     }
+
+    removeSocketFromAllListeners(socket);
 
     // if this broadcast exists, and they're not already a listener, then add them
     if (broadcaster && !_.include(broadcaster['listeners'], socket)) {
@@ -82,21 +87,55 @@ io.sockets.on('connection', function (socket) {
 
   });
 
+  socket.on('stop_broadcasting', function(data) {
+    var username = data.username;
+    var broadcaster = broadcasters[username];
+
+    // if the broadcast exists, tell all the clients to stop listening, and remove the broadcaster
+    if (broadcaster) {
+      _.each(broadcaster['listeners'], function(listener) {
+        listener.emit('stop_listening', { 'username': username });
+      });
+
+      broadcasters[username] = null;
+      broadcasters = _.compact(broadcasters);
+    }
+
+  });
+
   socket.on('disconnect', function () {
     util.debug('socket ('+ socket.id + ') disconnected');
     // loop through all the broadcasters, removing the socket from the listeners
-    _.each(broadcasters, function(broadcaster) {
-      _.each(broadcaster['listeners'], function(listeners) {
-        if (_.include(listeners, socket)) {
-          broadcaster['listeners'] = _.without(broadcaster['listeners'], socket);
-          util.debug('removed socket ('+ socket.id + ') from broadcaster: ' + broadcaster.username);
-        }
+    removeSocketFromAllListeners(socket);
+  });
 
-      });
+
+});
+
+function sendBroadcastersToSocket(socket) {
+  var cleanBroadcasters = []
+
+  _.each(broadcasters, function(broadcaster, username) {
+    var cleanBroadcaster = {
+      'username': username
+    };
+
+    cleanBroadcasters.push(cleanBroadcaster);
+  });
+
+  socket.emit('broadcasters', {'broadcasters': cleanBroadcasters});
+}
+
+function removeSocketFromAllListeners(socket) {
+  _.each(broadcasters, function(broadcaster) {
+    _.each(broadcaster['listeners'], function(listeners) {
+      if (_.include(listeners, socket)) {
+        broadcaster['listeners'] = _.without(broadcaster['listeners'], socket);
+        util.debug('removed socket ('+ socket.id + ') from broadcaster: ' + broadcaster.username);
+      }
 
     });
 
   });
 
-
-});
+}
