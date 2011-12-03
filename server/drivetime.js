@@ -117,7 +117,9 @@ function sendBroadcastersToSocket(socket) {
 
   _.each(broadcasters, function(broadcaster, username) {
     var cleanBroadcaster = {
-      'username': username
+      'username': username,
+      'track': broadcaster.track,
+      'timestamp': broadcaster.timestamp
     };
 
     cleanBroadcasters.push(cleanBroadcaster);
