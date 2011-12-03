@@ -12,9 +12,11 @@ var Drivetime = {
     });
   },
 
-  broadcast: function (stuff) {
-    console.log('trying to play stuff');
-    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(), track: stuff, timestamp: 'x' });
+  broadcast: function (track) {
+    var now = new Date();
+    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(),
+                                              track: track.uri,
+                                          timestamp: now.getTime() });
   },
 
   listen: function (user) {
@@ -119,7 +121,7 @@ function updatePageWithTrackDetails() {
     var track = playerTrackInfo.track;
     nowPlaying.innerText = track.name + " on the album " + track.album.name + " by " + track.album.artist.name + ".";
 
-    Drivetime.broadcast(track.uri);
+    Drivetime.broadcast(track);
   }
 }
 
