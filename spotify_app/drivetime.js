@@ -33,7 +33,7 @@ function init() {
   Drivetime.init();
   updateNowPlayingUser();
 
-  sp.core.addEventListener("argumentsChagned", function(event) {
+  sp.core.addEventListener("argumentsChanged", function(event) {
     updateNowPlayingUser();
   });
 
