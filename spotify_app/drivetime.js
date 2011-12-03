@@ -21,7 +21,7 @@ var Drivetime = {
 
     drivetimeSocket.on('stop_listening', function () {
       console.log("Got request to stop playing.");
-      // stop playing
+      Drivetime.stopListening();
     });
 
   },
@@ -38,11 +38,13 @@ var Drivetime = {
     if (currentBroadcaster) { 
       drivetimeSocket.emit('stop_listening', { username: currentBroadcaster });
       currentBroadcaster = null;
+      sp.trackPlayer.setIsPlaying(false);
     }
   },
 
   stopBroadcast: function () {
     drivetimeSocket.emit('stop_broadcasting', { username: sp.core.getAnonymousUserId() });
+    sp.trackPlayer.setIsPlaying(false);
   },
 
   listen: function (user) {
