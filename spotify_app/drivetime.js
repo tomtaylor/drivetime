@@ -34,7 +34,7 @@ DrivetimeUI.prototype.play = function (track, playlist) {
     var trackOffset = m + ":" + s;
     console.log("Track offset: " + trackOffset);
 
-    track = track.track; //+ "#" + trackOffset;
+    track = track.track + "#" + trackOffset;
   }
 
   this.playSpotifyUri(track, playlist);
