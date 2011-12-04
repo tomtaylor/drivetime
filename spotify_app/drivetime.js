@@ -121,12 +121,21 @@ DrivetimeUI.prototype.updatePlayInfo = function () {
   var nowPlaying = document.getElementById("nowplaying");
 
   var playingTrack = sp.trackPlayer.getNowPlayingTrack();
+  var context = sp.trackPlayer.getPlayingContext();
+  
 
   if (playingTrack == null) {
     nowPlaying.innerText = "Nothing playing!";
   } else {
     var track = playingTrack.track;
-    nowPlaying.innerText = track.name + " on the album " + track.album.name + " by " + track.album.artist.name + ".";
+    var text  = track.name + " on the album " + track.album.name + " by " + track.album.artist.name;
+    if(context[0]) {
+      var playlist = sp.core.getPlaylist(context[0]);
+      if(playlist) {
+        text = text + " on the playlist '" + playlist.name + "'";
+      }
+    }
+    nowPlaying.innerText = text + ".";
   }
 }
 
