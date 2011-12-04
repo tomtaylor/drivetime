@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <title>Drivetime</title>
     <link rel="stylesheet" href="sp://import/css/adam.css">
+    <link rel="stylesheet" href="sp://import/css/core-dark.css">
+    <link rel="stylesheet" href="sp://import/css/api.css">
     <link rel="stylesheet" href="drivetime.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="drivetime.js" type="text/javascript" charset="utf-8"></script>
@@ -21,19 +23,7 @@
       <h2>Your Playlist</h2>
 
       <div class='stop-button'><button class='new-button stop'>Stop Broadcasting</button></div>
-
-      <table cellspacing='0'>
-        <thead>
-          <tr><th>Track</th>
-              <th>Album</th>
-              <th>Artist</th>
-              <th>Duration</th>
-          </tr>
-        </thead>
-
-        <tbody id='playlistBody'>
-        </tbody>
-      </table>
+      <div class="list"></div>
     </div>
     <div id="djs">
       <h2>Current DJs</h2>

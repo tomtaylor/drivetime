@@ -1,6 +1,7 @@
 sp = getSpotifyApi(1);
 
 var models = sp.require('sp://import/scripts/api/models');
+var views = sp.require('sp://import/scripts/api/views');
 
 /* DrivetimeUI controls all things UI. */
 
@@ -198,7 +199,7 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
     tracks.push(playlist.getTrack(i));
   }
 
-  this.showPlaylist(tracks);
+  this.showPlaylist(playlistUri);
 
   var self = this;
 
@@ -220,20 +221,12 @@ DrivetimeUI.prototype.showPlaylistUi = function () {
   $("button.stop").show();
 }
 
-DrivetimeUI.prototype.showPlaylist = function (tracks) {
-
-  var playlist = $("#playlistBody");
-  playlist.html('');
-
-  for (var i = 0, l = tracks.length; i < l; i++) {
-    var row = $("<tr>");
-    row.append($("<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>"));
-    row.append($("<td>" + tracks[i].album.name + "</td>"));
-    row.append($("<td>" + tracks[i].album.artist.name + "</td>"));
-    row.append($("<td>" + this.msToTime(tracks[i].duration) + "</td>"));
-
-    playlist.append(row);
-  }
+DrivetimeUI.prototype.showPlaylist = function (playlistURI) {
+  var pl = models.Playlist.fromURI(playlistURI);
+  
+  var list = new views.List(pl);
+  $("#playlist .list").html("");
+  $("#playlist .list").append(list.node);
 }
 
 DrivetimeUI.prototype.msToTime = function (ms) {
