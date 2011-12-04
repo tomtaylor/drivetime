@@ -41,3 +41,13 @@ tr td:nth-child(4) {
 tr td, tr th {
   padding: 2px 5px;
 }
+
+h1.title {
+  width: 479px;
+  height: 156px;
+  background: url(drivetimelogo.png) no-repeat;
+}
+
+h1.title span {
+  display: none;
+}

@@ -1,6 +1,7 @@
 sp = getSpotifyApi(1);
 
 var models = sp.require('sp://import/scripts/api/models');
+var views = sp.require('sp://import/scripts/api/views');
 
 var displayName = function (name) {
   if (name) {
@@ -46,6 +47,8 @@ DrivetimeUI.prototype.play = function (track, playlist) {
   }
 
   this.playSpotifyUri(track, playlist);
+  $("button.stop").show();
+  $("#nowplaying").show();
 }
 
 // Public Method DrivetimeUI.stop()
@@ -54,6 +57,7 @@ DrivetimeUI.prototype.play = function (track, playlist) {
 DrivetimeUI.prototype.stop = function () {
   // sp.trackPlayer.setIsPlaying(false);
   models.player.playing = false;
+  $("button.stop").hide();
 }
 
 DrivetimeUI.prototype.displayName = displayName;
@@ -62,6 +66,7 @@ DrivetimeUI.prototype._setupUI = function () {
 
   $(document).ready(function() {
     $("#playlist").hide();
+    $("button.stop").hide();
   });
 
   var self = this;
@@ -80,6 +85,7 @@ DrivetimeUI.prototype._setupUI = function () {
     self.drivetime.stop();
 
     $("#playlist").hide();
+    $("#nowplaying").hide();
     $("#djs").show();
 
     return false;
@@ -113,9 +119,6 @@ DrivetimeUI.prototype._setupDropHandler = function () {
     console.log("Drop!");
     var playlistUri = evt.dataTransfer.getData("url");
 
-    $("#playlist").show();
-    $("#djs").hide();
-
     self.playPlaylist(playlistUri);
 
   	evt.preventDefault();
@@ -126,6 +129,8 @@ DrivetimeUI.prototype._setupDropHandler = function () {
   sp.core.addEventListener('linksChanged', function (event) {
 
     var playlistUri = sp.core.getLinks()[0];
+    
+
     self.playPlaylist(playlistUri);
   });
 
@@ -214,7 +219,7 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
     tracks.push(playlist.getTrack(i));
   }
 
-  this.showPlaylist(tracks);
+  this.showPlaylist(playlistUri);
 
   var self = this;
 
@@ -224,25 +229,24 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
     self.play(this.href, playlistUri);
     return false;
   });
-
+  
   this.play(tracks[0].uri, playlistUri);
   this.drivetime.broadcast();
+  this.showPlaylistUi();
 }
 
-DrivetimeUI.prototype.showPlaylist = function (tracks) {
+DrivetimeUI.prototype.showPlaylistUi = function () {
+  $("#playlist").show();
+  $("#djs").hide();
+  $("button.stop").show();
+}
 
-  var playlist = $("#playlistBody");
-  playlist.html('');
-
-  for (var i = 0, l = tracks.length; i < l; i++) {
-    var row = $("<tr>");
-    row.append($("<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>"));
-    row.append($("<td>" + tracks[i].album.name + "</td>"));
-    row.append($("<td>" + tracks[i].album.artist.name + "</td>"));
-    row.append($("<td>" + this.msToTime(tracks[i].duration) + "</td>"));
-
-    playlist.append(row);
-  }
+DrivetimeUI.prototype.showPlaylist = function (playlistURI) {
+  var pl = models.Playlist.fromURI(playlistURI);
+  
+  var list = new views.List(pl);
+  $("#playlist .list").html("");
+  $("#playlist .list").append(list.node);
 }
 
 DrivetimeUI.prototype.msToTime = function (ms) {
