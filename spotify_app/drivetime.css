@@ -60,6 +60,10 @@ h1.title span {
   margin: 10px 0;
 }
 
+#nowplaying {
+  display: none;
+}
+
 span.nameitself {
   color: #fff;
 }

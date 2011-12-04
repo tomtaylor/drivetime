@@ -243,6 +243,8 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
   this.play(tracks[0].uri, playlistUri);
   this.drivetime.broadcast();
   this.showPlaylistUi();
+
+  $("#nowplaying").hide();
 }
 
 DrivetimeUI.prototype.showPlaylistUi = function () {
