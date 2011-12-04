@@ -13,7 +13,7 @@
         "http://drivetime.tomtaylor.com:8081",
         "https://ajax.googleapis.com",
         "http://192.168.1.67:8081",
-        "http://172.16.104.242:8081"
+        "http://172.16.105.106:8081"
     ],
     "AcceptedLinkTypes": [
       "playlist"

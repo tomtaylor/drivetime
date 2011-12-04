@@ -1,5 +1,7 @@
 sp = getSpotifyApi(1);
 
+var models = sp.require('sp://import/scripts/api/models');
+
 /* DrivetimeUI controls all things UI. */
 
 var DrivetimeUI = function (drivetime) {
@@ -10,7 +12,7 @@ var DrivetimeUI = function (drivetime) {
   this._setupUI();
 
   this._createUpdatePlayInfoListener();
-  sp.trackPlayer.addEventListener('playerStateChanged', this.updatePlayInfoListener);
+  models.player.observe(models.EVENT.CHANGE, this.updatePlayInfoListener.bind(this));
 }
 
 // Public Method DrivetimeUI.play()
@@ -63,7 +65,6 @@ DrivetimeUI.prototype._setupUI = function () {
 DrivetimeUI.prototype._setupDropHandler = function () {
 
   var self = this;
-
   var dropTarget = document;
 
   dropTarget.addEventListener("dragleave", function (evt) {
@@ -158,7 +159,8 @@ DrivetimeUI.prototype.playSpotifyUri = function (trackUri, playlistUri) {
 
   if (playlistUri) {
     console.debug("Playing a track " + trackUri + " in context " + playlistUri);
-    sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri, eventHandlers);
+    // sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri, eventHandlers);
+    models.player.play(trackUri, playlistUri);
   } else {
     console.debug("Playing a track " + trackUri + " with no associated playlist.");
     sp.trackPlayer.playTrackFromUri(trackUri, eventHandlers);
@@ -178,7 +180,7 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
 
   this.showPlaylist(tracks);
 
-  var self = this
+  var self = this;
 
   $("a.tracklink").unbind();
 
@@ -335,5 +337,4 @@ Drivetime.prototype._updateListener = function () {
   }
 }
 
-var drivetime = new Drivetime("ws://192.168.1.67:8081");
-
+var drivetime = new Drivetime("ws://172.16.105.106:8081");
