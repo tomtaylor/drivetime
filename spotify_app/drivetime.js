@@ -175,7 +175,8 @@ DrivetimeUI.prototype.updatePlayInfo = function () {
         text = text + " on the playlist <span class='wht'>" + playlist.name + "</span>";
       }
     }
-    nowPlaying.innerHTML = text + ".";
+    $(".sp-image").append("<div class='playing-deets'>" + text + "</div>");
+    // nowPlaying.innerHTML = text + ".";
   }
 }
 
