@@ -38,6 +38,8 @@ DrivetimeUI.prototype.play = function (track, playlist) {
   }
 
   this.playSpotifyUri(track, playlist);
+  $("button.stop").show();
+  $("#nowplaying").show();
 }
 
 // Public Method DrivetimeUI.stop()
@@ -46,12 +48,14 @@ DrivetimeUI.prototype.play = function (track, playlist) {
 DrivetimeUI.prototype.stop = function () {
   // sp.trackPlayer.setIsPlaying(false);
   models.player.playing = false;
+  $("button.stop").hide();
 }
 
 
 DrivetimeUI.prototype._setupUI = function () {
   $(document).ready(function() {
     $("#playlist").hide();
+    $("button.stop").hide();
   });
 
   var self = this;
@@ -60,6 +64,7 @@ DrivetimeUI.prototype._setupUI = function () {
     self.drivetime.stop();
 
     $("#playlist").hide();
+    $("#nowplaying").hide();
     $("#djs").show();
 
     return false;
@@ -204,14 +209,15 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
     return false;
   });
   
-  this.showPlaylistUi();
   this.play(tracks[0].uri, playlistUri);
   this.drivetime.broadcast();
+  this.showPlaylistUi();
 }
 
 DrivetimeUI.prototype.showPlaylistUi = function () {
   $("#playlist").show();
   $("#djs").hide();
+  $("button.stop").show();
 }
 
 DrivetimeUI.prototype.showPlaylist = function (tracks) {
