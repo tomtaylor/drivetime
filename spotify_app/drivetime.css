@@ -71,3 +71,8 @@ span.wht {
 p.instructions {
   margin: 0 0 20px;
 }
+
+.sp-image {
+  width: 400px;
+  height: 400px;
+}

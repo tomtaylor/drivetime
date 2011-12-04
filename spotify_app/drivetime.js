@@ -163,6 +163,11 @@ DrivetimeUI.prototype.updatePlayInfo = function () {
   } else {
     var track = playingTrack.track;
     var text  = "<span class='wht'>" + track.name + "</span> on the album <span class='wht'>" + track.album.name + "</span> by <span class='wht'>" + track.album.artist.name + "</span>";
+    var image = new views.Image(track.album.cover);
+    
+    var nowPlayingPic = document.getElementById("nowplayingpic");
+    $("#nowplayingpic").html(image.node);
+    
     if(context[0]) {
       var playlist = sp.core.getPlaylist(context[0]);
       if(playlist) {
