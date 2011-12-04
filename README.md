@@ -1,5 +1,13 @@
 Drivetime
-==
+=========
+
+A Spotify App on the Spotify Platform that lets you broadcast a
+playlist, and lets others listen to it in real-time, as you listen to
+it.
+
+Made during Music Hackday London 2011 by [Blaine
+Cook](http://romeda.org/), [Tom Armitage](http://infovore.org) and
+[Tom Taylor](http://scraplab.net).
 
 Spotify App
 ===========
