@@ -24,7 +24,7 @@ DrivetimeUI.prototype.play = function (track, playlist) {
   if (typeof track != "string") {
 
     var now = new Date().getTime();
-    console.log("now: " + now + "; offset: " + this.serverTimeOffset + "; timestamp: " + track.timestamp);
+    console.log("now: " + now + "; timestamp: " + track.timestamp);
     var tsOffset = (now + this.serverTimeOffset - track.timestamp) / 1000;
 
     var m = Math.floor(tsOffset / 60);
