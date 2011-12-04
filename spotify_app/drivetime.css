@@ -53,7 +53,15 @@ h1.title span {
 }
 
 .stop-button {
-  margin: 5px 0;
+  position: fixed;
+  top: 5px;
+  right: 5px;
+}
+
+button.stop {
+  position: fixed;
+  top: 5px;
+  right: 5px;
 }
 
 #nameDisplay {
