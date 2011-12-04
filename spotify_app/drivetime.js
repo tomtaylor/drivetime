@@ -23,13 +23,16 @@ DrivetimeUI.prototype.play = function (track, playlist) {
 
   if (typeof track != "string") {
 
-    var tsOffset = (Date.now() + this.serverTimeOffset - track.timestamp) / 1000;
+    var now = new Date().getTime();
+    console.log("now: " + now + "; offset: " + this.serverTimeOffset + "; timestamp: " + track.timestamp);
+    var tsOffset = (now + this.serverTimeOffset - track.timestamp) / 1000;
 
     var m = Math.floor(tsOffset / 60);
     var s = ((tsOffset % 60) < 10) ? '0' : '';
     s = s + (tsOffset % 60).toFixed(3);
 
     var trackOffset = m + ":" + s;
+    console.log("Track offset: " + trackOffset);
 
     track = track.track; //+ "#" + trackOffset;
   }
@@ -41,7 +44,8 @@ DrivetimeUI.prototype.play = function (track, playlist) {
 //
 // takes no arguments, stops playback.
 DrivetimeUI.prototype.stop = function () {
-  sp.trackPlayer.setIsPlaying(false);
+  // sp.trackPlayer.setIsPlaying(false);
+  models.player.playing = false;
 }
 
 
@@ -163,7 +167,8 @@ DrivetimeUI.prototype.playSpotifyUri = function (trackUri, playlistUri) {
     models.player.play(trackUri, playlistUri);
   } else {
     console.debug("Playing a track " + trackUri + " with no associated playlist.");
-    sp.trackPlayer.playTrackFromUri(trackUri, eventHandlers);
+    // sp.trackPlayer.playTrackFromUri(trackUri, eventHandlers);
+    models.player.play(trackUri);
   }
 
 
@@ -252,6 +257,7 @@ Drivetime.prototype.stop = function () {
     sp.trackPlayer.removeEventListener('playerStateChanged', this.broadcastEmitter);
   }
 
+  console.log("[ -> ] Stopped");
   this.socket.emit('stop');
   this.ui.stop();
 }
