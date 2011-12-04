@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Drivetime Test Lab</title>
+
+  <script src="http://192.168.1.67:8081/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+Use the console, Luke.
+
+<pre>
+var server = "ws://192.168.1.67:8081"
+var socket = io.connect(server)
+
+socket.on('broadcasters', function (broadcasters) {
+  console.debug("[ &lt;- ] Received list of broadcasters: ", broadcasters);
+});
+
+socket.on('play', function (playInfo) { 
+  console.debug("[ &lt;- ] Received instruction to play a new track: ", playInfo);
+});
+
+socket.on('time', function (time) { 
+  console.debug("[ &lt;- ] Received server time: ", time);
+});
+
+socket.on('stop', function () {
+    console.debug("[ &lt;- ] Received request to stop playing.");
+});
+
+socket.emit('broadcast', { username: 'TEST USER',
+                              track: 'spotify:track:4rKbk0wpPDsnMmoB6SAwj4',
+                          timestamp: Date.now() });
+</pre>
+
+</body>
