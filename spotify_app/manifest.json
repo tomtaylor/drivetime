@@ -10,10 +10,8 @@
         "en"
     ],
     "RequiredPermissions": [
-        "http://drivetime.tomtaylor.com:8081",
-        "https://ajax.googleapis.com",
-        "http://192.168.1.67:8081",
-        "http://172.16.105.106:8081"
+        "http://driveti.me:8081",
+        "https://ajax.googleapis.com"
     ],
     "AcceptedLinkTypes": [
       "playlist"
