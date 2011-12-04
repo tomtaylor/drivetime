@@ -67,3 +67,7 @@ span.nameitself {
 span.wht {
   color: #fff;
 }
+
+p.instructions {
+  margin: 0 0 20px;
+}
