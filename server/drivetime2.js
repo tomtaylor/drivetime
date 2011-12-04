@@ -120,7 +120,7 @@ Client.prototype.stopBroadcasting = function() {
     util.debug("Broadcast metadata: " + util.inspect(this.statusMetadata));
     var broadcastUsername = this.statusMetadata.broadcastUsername;
     var broadcaster = broadcasters[broadcastUsername];
-    
+
     util.debug('stopped ' + broadcastUsername + ' broadcasting');
 
     // if the broadcast exists, tell all the clients to stop listening, and remove the broadcaster
