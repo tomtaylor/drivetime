@@ -2,6 +2,14 @@ sp = getSpotifyApi(1);
 
 var models = sp.require('sp://import/scripts/api/models');
 
+var displayName = function (name) {
+  if (name) {
+    localStorage.setItem('displayName', name);
+  }
+
+  return localStorage.getItem('displayName');
+}
+
 /* DrivetimeUI controls all things UI. */
 
 var DrivetimeUI = function (drivetime) {
@@ -48,13 +56,25 @@ DrivetimeUI.prototype.stop = function () {
   models.player.playing = false;
 }
 
+DrivetimeUI.prototype.displayName = displayName;
 
 DrivetimeUI.prototype._setupUI = function () {
+
   $(document).ready(function() {
     $("#playlist").hide();
   });
 
   var self = this;
+
+  if (!this.displayName()) {
+   
+    $(document).on('click', 'button.setDisplayName', function () {
+      self.displayName($("#displayName").val());
+      $("#nameSetup").hide();
+    });
+
+    $("#nameSetup").show();
+  }
 
   $(document).on("click", "button.stop", function () {
     self.drivetime.stop();
@@ -151,14 +171,14 @@ DrivetimeUI.prototype.setServerTimeOffset = function (serverTimeOffset) {
 
 DrivetimeUI.prototype.updateBroadcasters = function (broadcasters) {
   var nowtime = Date.now();
-  var genHtml = "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:{name}:cachetime:" + nowtime + "'>{name}</a></h3></li>";
+  var genHtml = "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:{username}:cachetime:" + nowtime + "'>{name}</a></h3></li>";
   
   $("#djlist").html('');
   for (var i = 0, l = broadcasters.length; i < l; i++) {
     var bc = broadcasters[i];
 
     if (sp.core.getAnonymousUserId() != bc.username) {
-      $("#djlist").append(genHtml.replace(/{name}/g, bc.username));
+      $("#djlist").append(genHtml.replace(/{username}/g, bc.username).replace(/{name}/g, bc.name));
     }
   }
 }
@@ -314,6 +334,8 @@ Drivetime.prototype._userId = function () {
   return sp.core.getAnonymousUserId();
 }
 
+Drivetime.prototype.displayName = displayName;
+
 Drivetime.prototype._sendBroadcast = function () {
   var playingTrack = sp.trackPlayer.getNowPlayingTrack();
 
@@ -323,6 +345,7 @@ Drivetime.prototype._sendBroadcast = function () {
   console.debug("[ -> ] Broadcasting: ", track)
 
   this.socket.emit('broadcast', { username: this.userId(),
+                                      name: this.displayName(),
                                      track: track.uri,
                                  timestamp: Date.now() - playingTrack.position });
 }
