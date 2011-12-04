@@ -25,7 +25,7 @@ function Client(socket) {
 
   var that = this;
   this.socket.on('broadcast', function(data) { that.onBroadcast(data); } );
-  this.socket.on('listen', function(data) { that.onListen(data) } );
+  this.socket.on('listen', function(data) { that.onListen(data); } );
   this.socket.on('stop', function(data) { that.onStop(data); });
   this.socket.on('disconnect', function() { that.onDisconnect(); } );
 }
@@ -33,14 +33,14 @@ function Client(socket) {
 Client.prototype.onBroadcast = function(data) {
   this.stopListening();
 
+  var username = data.username;
+  var track = data.track;
+  var timestamp = data.timestamp;
+
   this.status = "broadcasting";
   this.statusMetadata = {
     'broadcastUsername': username
   };
-
-  var username = data.username;
-  var track = data.track;
-  var timestamp = data.timestamp;
 
   var broadcaster = broadcasters[username];
   util.debug('socket ('+ this.socket.id + ') is broadcasting: ' + track);
@@ -117,6 +117,7 @@ Client.prototype.onStop = function(data) {
 
 Client.prototype.stopBroadcasting = function() {
   if (this.status == 'broadcasting') {
+    util.debug("Broadcast metadata: " + util.inspect(this.statusMetadata));
     var broadcastUsername = this.statusMetadata.broadcastUsername;
     var broadcaster = broadcasters[broadcastUsername];
     
@@ -129,7 +130,7 @@ Client.prototype.stopBroadcasting = function() {
 
       });
 
-      delete broadcasters[username];
+      delete broadcasters[broadcastUsername];
     }
 
     refreshAllBroadcasters();
