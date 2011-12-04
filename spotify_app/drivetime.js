@@ -48,8 +48,9 @@ DrivetimeUI.prototype.play = function (track, playlist) {
   }
 
   this.playSpotifyUri(track, playlist);
-  $("button.stop").show();
+
   $("#nowplaying").show();
+  $("#djs").hide();
 }
 
 // Public Method DrivetimeUI.stop()
@@ -58,7 +59,8 @@ DrivetimeUI.prototype.play = function (track, playlist) {
 DrivetimeUI.prototype.stop = function () {
   // sp.trackPlayer.setIsPlaying(false);
   models.player.playing = false;
-  $("button.stop").hide();
+//  $("button.stop").hide();
+  $("#djs").show();
 }
 
 DrivetimeUI.prototype.displayName = displayName;
@@ -69,7 +71,7 @@ DrivetimeUI.prototype._setupUI = function () {
 
   $(document).ready(function() {
     $("#playlist").hide();
-    $("button.stop").hide();
+//    $("button.stop").hide();
 
     if (typeof self.displayName() != 'string') {
    

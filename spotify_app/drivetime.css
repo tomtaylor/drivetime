@@ -52,12 +52,6 @@ h1.title span {
   display: none;
 }
 
-.stop-button {
-  position: fixed;
-  top: 5px;
-  right: 5px;
-}
-
 button.stop {
   position: fixed;
   top: 5px;
