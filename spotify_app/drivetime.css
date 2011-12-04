@@ -98,3 +98,24 @@ p.instructions {
   padding: 10px;
   opacity: 0.9;
 }
+
+#djlist {
+  margin: 10px 0;
+}
+
+#djlist li {
+  margin: 0 0 5px;
+}
+
+#djlist li h3 {
+  font-size: 18px;
+}
+
+#djlist li a:link, #djlist li a:visited {
+  color: #999;
+}
+
+#djlist li a:hover {
+  color: white;
+  text-decoration: underline;
+}
