@@ -21,6 +21,19 @@ span.clear {
   margin: 20px 0;
 }
 
+table {
+  width: 100%;
+  margin: 20px 0;
+}
+
 tr:nth-child(2n + 1) td {
   background: #444;
+}
+
+tr td:nth-child(4) {
+  text-align: right;
+}
+
+tr td, tr th {
+  padding: 2px 5px;
 }
