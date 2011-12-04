@@ -64,22 +64,22 @@ DrivetimeUI.prototype.displayName = displayName;
 
 DrivetimeUI.prototype._setupUI = function () {
 
+  var self = this;
+
   $(document).ready(function() {
     $("#playlist").hide();
     $("button.stop").hide();
-  });
 
-  var self = this;
-
-  if (!this.displayName()) {
+    if (typeof self.displayName() != 'string') {
    
-    $(document).on('click', 'button.setDisplayName', function () {
-      self.displayName($("#displayName").val());
-      $("#nameSetup").hide();
-    });
+      $(document).on('click', 'button.setDisplayName', function () {
+        self.displayName($("#displayName").val());
+        $("#nameSetup").hide();
+      });
 
-    $("#nameSetup").show();
-  }
+      $("#nameSetup").show();
+    }
+  });
 
   $(document).on("click", "button.stop", function () {
     self.drivetime.stop();
