@@ -51,3 +51,19 @@ h1.title {
 h1.title span {
   display: none;
 }
+
+.stop-button {
+  margin: 5px 0;
+}
+
+#nameDisplay {
+  margin: 10px 0;
+}
+
+span.nameitself {
+  color: #fff;
+}
+
+span.wht {
+  color: #fff;
+}

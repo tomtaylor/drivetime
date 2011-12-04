@@ -79,6 +79,9 @@ DrivetimeUI.prototype._setupUI = function () {
       });
 
       $("#nameSetup").show();
+    } else {
+      $("#nameSetup").hide();
+      $("#nameDisplay").html("Now Drivetiming as <span class='nameitself'>" + self.displayName() + "</span>");
     }
   });
 
@@ -160,14 +163,14 @@ DrivetimeUI.prototype.updatePlayInfo = function () {
     nowPlaying.innerText = "Nothing playing!";
   } else {
     var track = playingTrack.track;
-    var text  = track.name + " on the album " + track.album.name + " by " + track.album.artist.name;
+    var text  = "<span class='wht'>" + track.name + "</span> on the album <span class='wht'>" + track.album.name + "</span> by <span class='wht'>" + track.album.artist.name + "</span>";
     if(context[0]) {
       var playlist = sp.core.getPlaylist(context[0]);
       if(playlist) {
-        text = text + " on the playlist '" + playlist.name + "'";
+        text = text + " on the playlist <span class='wht'>" + playlist.name + "</span>";
       }
     }
-    nowPlaying.innerText = text + ".";
+    nowPlaying.innerHTML = text + ".";
   }
 }
 
