@@ -50,8 +50,10 @@ DrivetimeUI.prototype.stop = function () {
 
 
 DrivetimeUI.prototype._setupUI = function () {
-  $("#playlist").hide();
-  $(".stop-button").hide();
+  $(document).ready(function() {
+    $("#playlist").hide();
+    $(".stop-button").hide();
+  });
 
   var self = this;
 
