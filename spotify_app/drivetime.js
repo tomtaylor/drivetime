@@ -51,6 +51,7 @@ DrivetimeUI.prototype.stop = function () {
 
 DrivetimeUI.prototype._setupUI = function () {
   $("#playlist").hide();
+  $(".stop-button").hide();
 
   var self = this;
 
@@ -148,8 +149,8 @@ DrivetimeUI.prototype.setServerTimeOffset = function (serverTimeOffset) {
 }
 
 DrivetimeUI.prototype.updateBroadcasters = function (broadcasters) {
-
-  var genHtml = "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:{name}'>{name}</a></h3></li>";
+  var nowtime = Date.now();
+  var genHtml = "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:{name}:cachetime:" + nowtime + "'>{name}</a></h3></li>";
   
   $("#djlist").html('');
   for (var i = 0, l = broadcasters.length; i < l; i++) {
@@ -229,6 +230,16 @@ DrivetimeUI.prototype.msToTime = function (ms) {
   var s = Math.floor(ts % 60);
 
   return m + ":" + ((s < 10) ? "0" + s : s);
+}
+
+DrivetimeUI.prototype.updateBroadcasterLinks = function() {
+  $("#djlist li a").each(function(l) {
+    var currentUri = $(this).attr("href");
+    var components = currentUri.split(":");
+    components[components.length-1] = Date.now();
+    var newUri = components.join(":")
+    $(this).attr("href", newUri);
+  });
 }
 
 
@@ -348,6 +359,7 @@ Drivetime.prototype._updateListener = function () {
     if(args[i] == 'name') {
       this.listen(args[i+1]);
       var userId = args[i+1];
+      this.ui.updateBroadcasterLinks();
     }
   }
 }
