@@ -1,7 +1,7 @@
 {
     "BundleType": "Application",
     "AppIcon": {
-        "36x18": "tutorial.png"
+        "36x18": "drivetime-icon.png"
     },
     "AppName": {
         "en": "Drivetime"

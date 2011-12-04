@@ -93,9 +93,6 @@ DrivetimeUI.prototype._setupDropHandler = function () {
     console.log("Drop!");
     var playlistUri = evt.dataTransfer.getData("url");
 
-    $("#playlist").show();
-    $("#djs").hide();
-
     self.playPlaylist(playlistUri);
 
   	evt.preventDefault();
@@ -106,6 +103,8 @@ DrivetimeUI.prototype._setupDropHandler = function () {
   sp.core.addEventListener('linksChanged', function (event) {
 
     var playlistUri = sp.core.getLinks()[0];
+    
+
     self.playPlaylist(playlistUri);
   });
 
@@ -204,9 +203,15 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
     self.play(this.href, playlistUri);
     return false;
   });
-
+  
+  this.showPlaylistUi();
   this.play(tracks[0].uri, playlistUri);
   this.drivetime.broadcast();
+}
+
+DrivetimeUI.prototype.showPlaylistUi = function () {
+  $("#playlist").show();
+  $("#djs").hide();
 }
 
 DrivetimeUI.prototype.showPlaylist = function (tracks) {
