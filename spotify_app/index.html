@@ -2,12 +2,15 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>My First App</title>
+    <title>Drivetime</title>
     <link rel="stylesheet" href="sp://import/css/adam.css">
     <link rel="stylesheet" href="drivetime.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="drivetime.js" type="text/javascript" charset="utf-8"></script>
-    <script src="http://172.16.105.106:8081/socket.io/socket.io.js"></script>
+    <script src="socket.io.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+      var drivetime = new Drivetime("ws://172.16.105.106:8081");
+    </script>
 </head>
 <body onload="sp = getSpotifyApi(1); var ui = sp.require('sp://import/scripts/dnd'); drivetime = sp.require('drivetime');">
   <h1>Drivetime</h1>

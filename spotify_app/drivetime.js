@@ -336,5 +336,3 @@ Drivetime.prototype._updateListener = function () {
     }
   }
 }
-
-var drivetime = new Drivetime("ws://172.16.105.106:8081");
