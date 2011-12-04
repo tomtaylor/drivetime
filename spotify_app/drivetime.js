@@ -32,7 +32,8 @@ DrivetimeUI.prototype.play = function (track, playlist) {
 
   if (typeof track != "string") {
 
-    var now = new Date().getTime();
+    console.log(this.serverTimeOffset);
+    var now = Date.now() - this.serverTimeOffset;
     console.log("now: " + now + "; timestamp: " + track.timestamp);
     var tsOffset = (now - track.timestamp) / 1000;
 
@@ -332,7 +333,7 @@ Drivetime.prototype._setupCallbacks = function () {
 
   this.socket.on('time', function (time) { 
     console.debug("[ <- ] Received server time: ", time);
-    var offset = Date.now() - time;
+    var offset = Date.now() - time.time;
     self.ui.setServerTimeOffset(offset);
   });
 
