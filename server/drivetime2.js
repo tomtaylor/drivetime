@@ -36,6 +36,7 @@ Client.prototype.onBroadcast = function(data) {
   var username = data.username;
   var track = data.track;
   var timestamp = data.timestamp;
+  var name = data.name;
 
   this.status = "broadcasting";
   this.statusMetadata = {
@@ -49,16 +50,20 @@ Client.prototype.onBroadcast = function(data) {
     // set the new track and timestamp
     broadcaster['track'] = track;
     broadcaster['timestamp'] = timestamp;
+    broadcaster['name'] = name;
 
   } else {
     // if we've not seen this broadcaster before, then we setup up a blank array of listeners
     broadcaster = {
       'listeners': [],
       'track': track,
-      'timestamp': timestamp
+      'timestamp': timestamp,
+      'name': name
     };
 
     broadcasters[username] = broadcaster;
+
+    refreshAllBroadcasters();
   }
 
   var that = this;
@@ -126,7 +131,7 @@ Client.prototype.stopBroadcasting = function() {
     // if the broadcast exists, tell all the clients to stop listening, and remove the broadcaster
     if (broadcaster) {
       _.each(broadcaster['listeners'], function(listener) {
-        listener.emit('stop', { 'username': username });
+        listener.emit('stop', { 'username': broadcastUsername });
 
       });
 
@@ -158,7 +163,8 @@ Client.prototype.refreshBroadcasters = function() {
     var cleanBroadcaster = {
       'username': username,
       'track': broadcaster.track,
-      'timestamp': broadcaster.timestamp
+      'timestamp': broadcaster.timestamp,
+      'name': broadcaster.name
     };
 
     cleanBroadcasters.push(cleanBroadcaster);
