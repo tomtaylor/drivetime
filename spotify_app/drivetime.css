@@ -21,6 +21,6 @@ span.clear {
   margin: 20px 0;
 }
 
-tr.even td {
+tr:nth-child(2n + 1) td {
   background: #444;
 }

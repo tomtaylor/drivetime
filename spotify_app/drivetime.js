@@ -1,75 +1,71 @@
 sp = getSpotifyApi(1);
 
-exports.init = init;
+/* DrivetimeUI controls all things UI. */
 
-var drivetimeSocket;
-var currentBroadcaster;
+var DrivetimeUI = function (drivetime) {
+  this.serverTimeOffset = 0;
+  this.user = sp.core.getAnonymousUserId();
+  this.drivetime = drivetime;
 
-var Drivetime = {
+  this._setupUI();
 
-  init: function () {
-    drivetimeSocket = io.connect("ws://172.16.104.242:8081");
-    drivetimeSocket.on('broadcasters', function (broadcasters) {
-      console.log('Got broadcaster list: ', broadcasters);
-      updateBroadcasters(broadcasters);
-    });
+  this._createUpdatePlayInfoListener();
+  sp.trackPlayer.addEventListener('playerStateChanged', this.updatePlayInfoListener);
+}
 
-    drivetimeSocket.on('play', function (playInfo) {
-      console.log("Got request to play: ", playInfo);
-      playATrack(playInfo.track, playInfo.playlist);
-    });
+// Public Method DrivetimeUI.play()
+//
+// takes a track URI and an optional playlist URI and plays the track in the
+// context of the playlist.
+DrivetimeUI.prototype.play = function (track, playlist) {
 
-    drivetimeSocket.on('stop_listening', function () {
-      console.log("Got request to stop playing.");
-      Drivetime.stopListening();
-    });
+  if (typeof track != "string") {
 
-  },
+    var tsOffset = (Date.now() + this.serverTimeOffset - track.timestamp) / 1000;
 
-  broadcast: function (track) {
-    Drivetime.stopListening();
-    var now = new Date();
-    drivetimeSocket.emit('broadcasting', { username: sp.core.getAnonymousUserId(),
-                                              track: track.uri,
-                                          timestamp: now.getTime() });
-  },
+    var m = Math.floor(tsOffset / 60);
+    var s = ((tsOffset % 60) < 10) ? '0' : '';
+    s = s + (tsOffset % 60).toFixed(3);
 
-  stopListening: function () {
-    if (currentBroadcaster) { 
-      drivetimeSocket.emit('stop_listening', { username: currentBroadcaster });
-      currentBroadcaster = null;
-      sp.trackPlayer.setIsPlaying(false);
-    }
-  },
+    var trackOffset = m + ":" + s;
 
-  stopBroadcast: function () {
-    drivetimeSocket.emit('stop_broadcasting', { username: sp.core.getAnonymousUserId() });
-    sp.trackPlayer.setIsPlaying(false);
-  },
+    track = track.track; //+ "#" + trackOffset;
+  }
 
-  listen: function (user) {
-    Drivetime.stopBroadcast();
-    drivetimeSocket.emit('listen_to', { username: user });
-    currentBroadcaster = user;
-  },
+  this.playSpotifyUri(track, playlist);
+}
 
-};
+// Public Method DrivetimeUI.stop()
+//
+// takes no arguments, stops playback.
+DrivetimeUI.prototype.stop = function () {
+  sp.trackPlayer.setIsPlaying(false);
+}
 
-function init() {
 
-  Drivetime.init();
-  updateNowPlayingUser();
-  
+DrivetimeUI.prototype._setupUI = function () {
   $("#playlist").hide();
-  
-  jQuery(document).on("click", "button.stop", function() {
-    Drivetime.stopBroadcast();
+
+  var self = this;
+
+  $(document).on("click", "button.stop", function () {
+    self.drivetime.stop();
+
     $("#playlist").hide();
     $("#djs").show();
+
     return false;
   });
-  
+
+  this._setupDropHandler();
+}
+
+DrivetimeUI.prototype._setupDropHandler = function () {
+
+  var self = this;
+
   var dropTarget = document;
+
   dropTarget.addEventListener("dragleave", function (evt) {
   	evt.preventDefault();
   	evt.stopPropagation();
@@ -86,147 +82,258 @@ function init() {
   }, false);
 
   dropTarget.addEventListener("drop", function (evt) {
+
     console.log("Drop!");
-    var uri = evt.dataTransfer.getData("url");
+    var playlistUri = evt.dataTransfer.getData("url");
+
     $("#playlist").show();
     $("#djs").hide();
-    playPlaylistFromUri(uri);
+
+    self.playPlaylist(playlistUri);
+
   	evt.preventDefault();
   	evt.stopPropagation();
+
   }, false);
 
-  sp.core.addEventListener("argumentsChanged", function(event) {
-    updateNowPlayingUser();
+  sp.core.addEventListener('linksChanged', function (event) {
+
+    var playlistUri = sp.core.getLinks()[0];
+    self.playPlaylist(playlistUri);
   });
 
-  function updateNowPlayingUser() {
-    var args = sp.core.getArguments();
+}
 
-    for (var i = 0, l = args.length; i < l; i++) {
-      if(args[i] == 'name') {
-        Drivetime.listen(args[i+1]);
-        var userId = args[i+1];
-      }
-    }
-  }
+DrivetimeUI.prototype._createUpdatePlayInfoListener = function () {
 
+  var self = this;
 
-  updatePageWithTrackDetails();
-  sp.trackPlayer.addEventListener("playerStateChanged", function (event) {
-    // Only update the page if the track changed
+  this.updatePlayInfoListener = function (event) {
     if (event.data.curtrack == true) {
-      updatePageWithTrackDetails();
+      this.updatePlayInfo();
     }
-  });
-  
-  $('document').on('drop', function() {
-    console.log('drop!');
-  });
-  
-  sp.core.addEventListener("linksChanged", function(event) {
-    var playlistURI = sp.core.getLinks()[0];
-    playPlaylistFromUri(playlistURI);
-  });
-  
-}
-
-function playPlaylistFromUri(uri) {
-  var playlist = sp.core.getPlaylist(uri);
-  var tracks = new Array();
-  for (var i=0; i < playlist.length; i++) {
-    var track = playlist.getTrack(i);
-    tracks.push(track);
-  };
-  
-  buildUIForTracks(tracks)
-
-  Drivetime.broadcast(tracks[0]);
-  playATrack(tracks[0].uri, uri)
-}
-
-function buildUIForTracks(tracks) {
-  // now we display those
-  var playlistElement = document.getElementById("playlist");
-  playlistElement.innerHTML = "";
-  var tracksHTML = "";
-  for (var i=0; i < tracks.length; i++) {
-    var rowtag = "<tr>";
-    if(i % 2 == 0) {
-      rowtag = "<tr class='even'>";
-    }
-    
-    tracksHTML = tracksHTML + rowtag + "<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>" + "<td>" + tracks[i].album.name + "</td>" + "<td>" + tracks[i].album.artist.name + "</td>" + "<td>" + millisToTimeString(tracks[i].duration) + "</td>" + "</tr>"
-  };
-  
-  playlistElement.innerHTML = "<h2>Your Playlist</h2><div class'stop-button'><button class='new-button stop'>Stop Broadcasting</button></div><table cellspacing='0'><thead><tr><th>Track</th><th>Album</th><th>Artist</th><th>Duration</th></tr></thead><tbody>" + tracksHTML  + "</tbody></table>"
-
-  
-  jQuery("a.tracklink").unbind();
-  jQuery(document).on("click", "a.tracklink", function() {
-
-    var track = sp.trackPlayer.getNowPlayingTrack();
-    Drivetime.broadcast(track);
-
-    playATrack(this.href, uri);
-    return false;
-  });
-}
-
-function playATrack (trackUri, playlistUri) {
-  if(playlistUri) {
-    sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri,  {
-                onSuccess: function() { console.log("success"); },
-                onFailure: function () { console.log("failure"); },
-                onComplete: function () { console.log("complete"); }
-    });
-  } else {
-    sp.trackPlayer.playTrackFromUri(trackUri,  {
-                onSuccess: function() { console.log("success"); },
-                onFailure: function () { console.log("failure"); },
-                onComplete: function () { console.log("complete"); }
-    });
   }
 }
 
-function updatePageWithTrackDetails() {
+DrivetimeUI.prototype.updatePlayInfo = function () {
 
   var nowPlaying = document.getElementById("nowplaying");
 
-  // This will be null if nothing is playing.
-  var playerTrackInfo = sp.trackPlayer.getNowPlayingTrack();
+  var playingTrack = sp.trackPlayer.getNowPlayingTrack();
 
-  if (playerTrackInfo == null) {
+  if (playingTrack == null) {
     nowPlaying.innerText = "Nothing playing!";
   } else {
-    var track = playerTrackInfo.track;
+    var track = playingTrack.track;
     nowPlaying.innerText = track.name + " on the album " + track.album.name + " by " + track.album.artist.name + ".";
   }
 }
 
-function updateBroadcasters(broadcasters) {
-    // this gets a list of broadcasters, each one a hash with some info about what the broadcaster is broadcasting.
-    var broadcastersArray = broadcasters['broadcasters'];
-    var broadcastersHtmlString = "";
-    for (var i=0; i < broadcastersArray.length; i++) {
-      var bc = broadcastersArray[i];
-      
-      var currentUser = sp.core.getAnonymousUserId();
-      var userId = bc.username;
-      
-      if(userId != currentUser) {
-        broadcastersHtmlString += "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:" + userId + "'>" + userId + "</a></h3><p><b>Now playing:</b> " + " </p></li>"
-      }
-      
-    };
-    $("#djlist").html(broadcastersHtmlString);
+DrivetimeUI.prototype.setServerTimeOffset = function (serverTimeOffset) {
+  this.serverTimeOffset = serverTimeOffset;
 }
 
-function millisToTimeString(millis) {
-  var seconds = millis / 1000;
-  var fullMinutes = Math.floor(seconds / 60);
-  var remainingSeconds = seconds - (60 * fullMinutes);
-  if(remainingSeconds.toString().length < 2) {
-    remainingSeconds = "0" + remainingSeconds;
+DrivetimeUI.prototype.updateBroadcasters = function (broadcasters) {
+
+  var genHtml = "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:{name}'>{name}</a></h3></li>";
+  
+  $("#djlist").html('');
+  for (var i = 0, l = broadcasters.length; i < l; i++) {
+    var bc = broadcasters[i];
+
+    if (sp.core.getAnonymousUserId() != bc.username) {
+      $("#djlist").append(genHtml.replace(/{name}/g, bc.username));
+    }
   }
-  return fullMinutes + ":" + remainingSeconds;
 }
+
+DrivetimeUI.prototype.playSpotifyUri = function (trackUri, playlistUri) {
+  
+  var self = this;
+
+  var eventHandlers = { onSuccess: function () { console.log("success");  },
+                        onFailure: function () { console.log("failure");  },
+                       onComplete: function () { console.log("complete");
+                                                 self.updatePlayInfo(); } }
+
+  if (playlistUri) {
+    console.debug("Playing a track " + trackUri + " in context " + playlistUri);
+    sp.trackPlayer.playTrackFromContext(trackUri, 2, playlistUri, eventHandlers);
+  } else {
+    console.debug("Playing a track " + trackUri + " with no associated playlist.");
+    sp.trackPlayer.playTrackFromUri(trackUri, eventHandlers);
+  }
+
+
+}
+
+DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
+
+  var playlist = sp.core.getPlaylist(playlistUri);
+
+  var tracks = [];
+  for (var i = 0, l = playlist.length; i < l; i++) {
+    tracks.push(playlist.getTrack(i));
+  }
+
+  this.showPlaylist(tracks);
+
+  var self = this
+
+  $("a.tracklink").unbind();
+
+  $(document).on('click', 'a.tracklink', function () {
+    self.play(this.href, playlistUri);
+    return false;
+  });
+
+  this.play(tracks[0].uri, playlistUri);
+  this.drivetime.broadcast();
+}
+
+DrivetimeUI.prototype.showPlaylist = function (tracks) {
+
+  var playlist = $("#playlistBody");
+  playlist.html('');
+
+  for (var i = 0, l = tracks.length; i < l; i++) {
+    var row = $("<tr>");
+    row.append($("<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>"));
+    row.append($("<td>" + tracks[i].album.name + "</td>"));
+    row.append($("<td>" + tracks[i].album.artist.name + "</td>"));
+    row.append($("<td>" + this.msToTime(tracks[i].duration) + "</td>"));
+
+    playlist.append(row);
+  }
+}
+
+DrivetimeUI.prototype.msToTime = function (ms) {
+  var ts = ms / 1000;
+  var m = Math.floor(ts / 60);
+  var s = Math.floor(ts % 60);
+
+  return m + ":" + ((s < 10) ? "0" + s : s);
+}
+
+
+var Drivetime = function (server) {
+
+  this.socket = io.connect(server);
+
+  this.ui = new DrivetimeUI(this);
+
+  this._setupCallbacks();
+  this._setupSpotifyListeners();
+
+}
+
+Drivetime.prototype.broadcast = function () {
+
+  console.debug("[ <> ] Starting to Broadcast.");
+
+  this.stop();
+  sp.trackPlayer.addEventListener("playerStateChanged", this.broadcastEmitter);
+  this._sendBroadcast();
+}
+
+Drivetime.prototype.listen = function (user) {
+
+  console.debug("[ -> ] Listening: ", user);
+
+  this.stop();
+  this.socket.emit('listen', { username: user });
+}
+
+Drivetime.prototype.stop = function () {
+
+  if (this.broadcastEmitter) {
+    sp.trackPlayer.removeEventListener('playerStateChanged', this.broadcastEmitter);
+  }
+
+  this.socket.emit('stop');
+  this.ui.stop();
+}
+
+
+Drivetime.prototype._setupCallbacks = function () {
+
+  var self = this;
+
+  this.socket.on('broadcasters', function (broadcasters) {
+    console.debug("[ <- ] Received list of broadcasters: ", broadcasters);
+    self.ui.updateBroadcasters(broadcasters.broadcasters);
+  });
+
+  this.socket.on('play', function (playInfo) { 
+    console.debug("[ <- ] Received instruction to play a new track: ", playInfo);
+    self.ui.play(playInfo, false);
+  });
+
+  this.socket.on('time', function (time) { 
+    console.debug("[ <- ] Received server time: ", time);
+    var offset = Date.now() - time;
+    self.ui.setServerTimeOffset(offset);
+  });
+
+  this.socket.on('stop', function () {
+    console.debug("[ <- ] Received request to stop playing.");
+    self.stop();
+  });
+}
+
+Drivetime.prototype._userId = function () {
+  return sp.core.getAnonymousUserId();
+}
+
+Drivetime.prototype._sendBroadcast = function () {
+  var playingTrack = sp.trackPlayer.getNowPlayingTrack();
+
+  if (!playingTrack) return;
+  var track = playingTrack.track;
+
+  console.debug("[ -> ] Broadcasting: ", track)
+
+  this.socket.emit('broadcast', { username: this.userId(),
+                                     track: track.uri,
+                                 timestamp: Date.now() - playingTrack.position });
+}
+
+Drivetime.prototype.userId = function () {
+  return sp.core.getAnonymousUserId();
+}
+
+Drivetime.prototype._setupSpotifyListeners = function () {
+
+  console.debug("Setting up Spotify Listeners.");
+
+  var self = this;
+
+  this.broadcastEmitter = function (event) {
+
+    // Only update the page if the track has changed.
+    if (event.data.curtrack == true) {
+      self._sendBroadcast();
+    }
+  }
+
+  this._handleArgumentsChange = function (event) {
+    console.debug("[ <> ] Arguments have changed: ", sp.core.getArguments());
+    self._updateListener();
+  }
+
+  sp.core.addEventListener("argumentsChanged", this._handleArgumentsChange);
+}
+
+Drivetime.prototype._updateListener = function () {
+  var args = sp.core.getArguments();
+
+  for (var i = 0, l = args.length; i < l; i++) {
+    if(args[i] == 'name') {
+      this.listen(args[i+1]);
+      var userId = args[i+1];
+    }
+  }
+}
+
+var drivetime = new Drivetime("ws://192.168.1.67:8081");
+
