@@ -21,6 +21,10 @@ span.clear {
   margin: 20px 0;
 }
 
+#nameSetup {
+  display: none;
+}
+
 table {
   width: 100%;
   margin: 20px 0;

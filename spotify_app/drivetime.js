@@ -1,6 +1,15 @@
 sp = getSpotifyApi(1);
 
 var models = sp.require('sp://import/scripts/api/models');
+var views = sp.require('sp://import/scripts/api/views');
+
+var displayName = function (name) {
+  if (name) {
+    localStorage.setItem('displayName', name);
+  }
+
+  return localStorage.getItem('displayName');
+}
 
 /* DrivetimeUI controls all things UI. */
 
@@ -38,6 +47,8 @@ DrivetimeUI.prototype.play = function (track, playlist) {
   }
 
   this.playSpotifyUri(track, playlist);
+  $("button.stop").show();
+  $("#nowplaying").show();
 }
 
 // Public Method DrivetimeUI.stop()
@@ -46,20 +57,35 @@ DrivetimeUI.prototype.play = function (track, playlist) {
 DrivetimeUI.prototype.stop = function () {
   // sp.trackPlayer.setIsPlaying(false);
   models.player.playing = false;
+  $("button.stop").hide();
 }
 
+DrivetimeUI.prototype.displayName = displayName;
 
 DrivetimeUI.prototype._setupUI = function () {
+
   $(document).ready(function() {
     $("#playlist").hide();
+    $("button.stop").hide();
   });
 
   var self = this;
+
+  if (!this.displayName()) {
+   
+    $(document).on('click', 'button.setDisplayName', function () {
+      self.displayName($("#displayName").val());
+      $("#nameSetup").hide();
+    });
+
+    $("#nameSetup").show();
+  }
 
   $(document).on("click", "button.stop", function () {
     self.drivetime.stop();
 
     $("#playlist").hide();
+    $("#nowplaying").hide();
     $("#djs").show();
 
     return false;
@@ -150,14 +176,14 @@ DrivetimeUI.prototype.setServerTimeOffset = function (serverTimeOffset) {
 
 DrivetimeUI.prototype.updateBroadcasters = function (broadcasters) {
   var nowtime = Date.now();
-  var genHtml = "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:{name}:cachetime:" + nowtime + "'>{name}</a></h3></li>";
+  var genHtml = "<li><h3><a class='listenlink' href='spotify:app:drivetime:name:{username}:cachetime:" + nowtime + "'>{name}</a></h3></li>";
   
   $("#djlist").html('');
   for (var i = 0, l = broadcasters.length; i < l; i++) {
     var bc = broadcasters[i];
 
     if (sp.core.getAnonymousUserId() != bc.username) {
-      $("#djlist").append(genHtml.replace(/{name}/g, bc.username));
+      $("#djlist").append(genHtml.replace(/{username}/g, bc.username).replace(/{name}/g, bc.name));
     }
   }
 }
@@ -193,7 +219,7 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
     tracks.push(playlist.getTrack(i));
   }
 
-  this.showPlaylist(tracks);
+  this.showPlaylist(playlistUri);
 
   var self = this;
 
@@ -204,30 +230,23 @@ DrivetimeUI.prototype.playPlaylist = function (playlistUri) {
     return false;
   });
   
-  this.showPlaylistUi();
   this.play(tracks[0].uri, playlistUri);
   this.drivetime.broadcast();
+  this.showPlaylistUi();
 }
 
 DrivetimeUI.prototype.showPlaylistUi = function () {
   $("#playlist").show();
   $("#djs").hide();
+  $("button.stop").show();
 }
 
-DrivetimeUI.prototype.showPlaylist = function (tracks) {
-
-  var playlist = $("#playlistBody");
-  playlist.html('');
-
-  for (var i = 0, l = tracks.length; i < l; i++) {
-    var row = $("<tr>");
-    row.append($("<td><a class='tracklink' href='" + tracks[i].uri + "'>" + tracks[i].name + "</a></td>"));
-    row.append($("<td>" + tracks[i].album.name + "</td>"));
-    row.append($("<td>" + tracks[i].album.artist.name + "</td>"));
-    row.append($("<td>" + this.msToTime(tracks[i].duration) + "</td>"));
-
-    playlist.append(row);
-  }
+DrivetimeUI.prototype.showPlaylist = function (playlistURI) {
+  var pl = models.Playlist.fromURI(playlistURI);
+  
+  var list = new views.List(pl);
+  $("#playlist .list").html("");
+  $("#playlist .list").append(list.node);
 }
 
 DrivetimeUI.prototype.msToTime = function (ms) {
@@ -319,6 +338,8 @@ Drivetime.prototype._userId = function () {
   return sp.core.getAnonymousUserId();
 }
 
+Drivetime.prototype.displayName = displayName;
+
 Drivetime.prototype._sendBroadcast = function () {
   var playingTrack = sp.trackPlayer.getNowPlayingTrack();
 
@@ -328,6 +349,7 @@ Drivetime.prototype._sendBroadcast = function () {
   console.debug("[ -> ] Broadcasting: ", track)
 
   this.socket.emit('broadcast', { username: this.userId(),
+                                      name: this.displayName(),
                                      track: track.uri,
                                  timestamp: Date.now() - playingTrack.position });
 }
