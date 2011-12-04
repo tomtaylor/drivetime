@@ -32,7 +32,10 @@ Server
 To co-ordinate playback between broadcasters and listeners we have a
 simple node.js server with socket.io.
 
-It requires node 0.6.4.
+It requires node 0.6.4. Run it with `node server/drivetime.js` and
+change the javascript in `spotify_app/index.html` to point to the
+correct URL for your server. You'll need to update the
+`spotify_app/manifest.json` to allow access to your host.
 
 License
 =======
