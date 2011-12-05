@@ -11,8 +11,8 @@
     ],
     "RequiredPermissions": [
         "http://driveti.me:8081",
-        "https://ajax.googleapis.com",
-    ],
+        "https://ajax.googleapis.com"
+    ]
     "AcceptedLinkTypes": [
       "playlist"
     ]
