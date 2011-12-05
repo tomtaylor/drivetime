@@ -1,5 +1,15 @@
+html {
+  margin: 0;
+  padding: 0;
+  background: #191919;
+  height: 100%;
+}
+
 body {
-  margin: 10px;
+  margin: 0;
+  padding: 0;
+  background: #191919;
+  height: 100%;
 }
 
 span.clear {
@@ -42,32 +52,78 @@ tr td, tr th {
   padding: 2px 5px;
 }
 
-h1.title {
+div.title { margin: 0 auto; width: 705px; }
+
+h1.title img { position: relative; float: left; margin-right: 10px; margin-top: 30px; }
+
+h1.title div {
   width: 479px;
   height: 156px;
-  background: url(drivetimelogo.png) no-repeat;
+  background: url(drivetime-logo2.png) no-repeat;
+  float: left;
 }
 
-h1.title span {
+h1.title div span {
+font-family:'Mistral W01';
+}
+
+h1.title div span {
   display: none;
 }
 
-button.stop {
+/*button.stop {
   position: fixed;
-  top: 5px;
+  bottom: 5px;
   right: 5px;
+}*/
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0 auto;
+  padding: 15px 10px;
+  background-color: #111111;
+  height: 25px;
+}
+
+footer p {
+  margin-top: 4px;
+  font-size: 1.6em;
+}
+
+#djs {
+  box-shadow: 0 0 5px 5px #111111 inset;
+  background-color: #222222;
+  border-radius: 5px;
+  margin: 30px;
+  height: 100px;
+
+  padding: 30px;
+}
+
+#stop-listening, #stop-broadcasting {
+  position: absolute;
+  right: 30px;
+  bottom: 15px;
+  display: none;
 }
 
 #nameDisplay {
   margin: 10px 0;
 }
 
+#playlist {
+  display: none;
+}
+
 #nowplaying {
   display: none;
 }
 
-span.nameitself {
-  color: #fff;
+span#nameDisplay {
+  color: #ff0080;
 }
 
 span.wht {
@@ -112,4 +168,12 @@ p.instructions {
 #djlist li a:hover {
   color: white;
   text-decoration: underline;
+}
+
+.list {
+  padding: 0 30px;
+}
+
+.list .sp-list {
+  box-shadow: 0 0 4px 6px rgba(0, 0, 0, 1), 0 0 4px 8px rgba(255, 0, 128, 1);
 }
