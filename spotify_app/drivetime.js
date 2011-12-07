@@ -71,20 +71,27 @@ DrivetimeUI.prototype._setupUI = function () {
 
   $(document).ready(function() {
 
-    if (typeof self.displayName() != 'string') {
-   
-      $(document).on('click', 'button.setDisplayName', function () {
-        self.displayName($("#displayName").val());
-        $("#nameSetup").hide();
-      });
+    $(document).on('click', 'button.setDisplayName', function () {
+      self.displayName($("#displayName").val());
+      $("#nameSetup").hide();
+      $("#nameDisplay").show();
+    });
 
+    if (typeof self.displayName() != 'string') {
+      $("#nameDisplay").hide();
       $("#nameSetup").show();
     } else {
       $("#nameSetup").hide();
+
+      $(document).on('click', '#nameDisplay', function () {
+        $("#nameDisplay").hide();
+        $("#nameSetup").show();
+        $("#displayName").focus();
+      });
+
       $("#nameDisplay").html(self.displayName());
     }
 
-console.log('trying to set djs height', $("#djs").offset().top, $("footer").offset().top);
     $("#djs").height( $("footer").offset().top - $("#djs").offset().top - 90 );
 
   });
